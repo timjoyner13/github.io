@@ -26,6 +26,8 @@
             align-items: center; 
             justify-content: center;
             overflow: hidden;
+
+            padding-bottom: 40px;
         }
 
         /* Scanlines & Abdunklung */
@@ -97,6 +99,74 @@
         .status-bar { margin-top: 25px; font-size: 0.75em; color: var(--army); letter-spacing: 2px; }
         .blink { animation: blinker 1.5s linear infinite; color: var(--accent); }
         @keyframes blinker { 50% { opacity: 0; } }
+
+        /* --- TACTICAL NEWS FLASH FOOTER --- */
+.news-flash-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.9);
+    border-top: 2px solid var(--army);
+    display: flex;
+    align-items: center;
+    z-index: 2000;
+    overflow: hidden;
+    font-size: 0.85em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Der statische rote/grüne "Status"-Block vorne */
+.news-title {
+    background: var(--army);
+    color: #fff;
+    padding: 0 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    z-index: 2001;
+    border-right: 2px solid var(--accent);
+    text-transform: uppercase;
+}
+
+/* Container für die Laufschrift */
+.ticker-wrapper {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-text {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%; /* Startet außerhalb des Sichtfelds */
+    animation: ticker 30s linear infinite;
+    color: var(--accent);
+    text-transform: uppercase;
+}
+
+.ticker-item {
+    display: inline-block;
+    padding-right: 50px;
+}
+
+.ticker-item::before {
+    content: " [ +++ ] ";
+    color: var(--army);
+    margin-right: 10px;
+}
+
+/* Die Animation */
+@keyframes ticker {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+}
+
+
     </style>
 </head>
 <body>
@@ -118,7 +188,7 @@
         <div class="main-menu">
             <a href="htmls/nml/1vs1.html" class="nav-link">Blitz-KO<small>Single Elimination</small></a>
             <a href="htmls/de/DE1vs1.html" class="nav-link">Redemption<small>Double Elimination</small></a>
-            <a href="htmls/nml/1vs1.html" class="nav-link">Total Engagement<small>Round Robin</small></a>
+            <a href="htmls/rbn/rbn1vs1.html" class="nav-link">Total Engagement<small>Round Robin</small></a>
             <a href="htmls/manuel.html" class="nav-link">Manuel <small>Tunier Modis erklärt!</small></a>
         </div>
         
@@ -126,6 +196,20 @@
             TERMINAL v4.5 - SECURE DATA LINK
         </div>
     </div>
+
+    <footer class="news-flash-footer">
+        <div class="news-title">Intel Feed</div>
+        <div class="ticker-wrapper">
+            <div class="ticker-text">
+                <span class="ticker-item">Operation PEPE BATTALION: All Systems Nominal</span>
+                <span class="ticker-item">Status: Recruiting new Operators...</span>
+                <span class="ticker-item">Intel: Next Tournament Deployment scheduled for 2000 Hours</span>
+                <span class="ticker-item">Warning: Enemy Movement detected in sector 7G</span>
+                <span class="ticker-item">Breaking: Commander PEPE promotes 3 new Sergeants</span>
+                <span class="ticker-item">Weather: High Visibility for tactical insertions</span>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

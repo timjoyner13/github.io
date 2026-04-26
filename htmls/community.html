@@ -9,6 +9,8 @@
             font-family: 'Courier New', monospace; background-image: url('DEIN_HINTERGRUND.gif'); 
             background-size: cover; background-attachment: fixed; color: var(--accent); 
             display: flex; flex-direction: column; align-items: center; margin: 0; padding: 20px; padding-top: 90px;
+
+            padding-bottom: 40px;
         }
         body::after { content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background: rgba(0,0,0,0.85); z-index: 1; pointer-events: none; }
         
@@ -30,7 +32,6 @@
         }
 
         h3 {
-            
             text-shadow: 0 0 7px var(--accent);
         }
 
@@ -54,13 +55,80 @@
         .stat-bar { background: rgba(0,255,65,0.05); padding: 10px; margin: 10px 0; border: 1px solid rgba(75,83,32,0.3); font-size: 0.75em; display: flex; justify-content: space-between; }
         .blink { animation: blinker 1s linear infinite; }
         @keyframes blinker { 50% { opacity: 0; } }
-    </style>
+
+        /* --- TACTICAL NEWS FLASH FOOTER --- */
+.news-flash-footer {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    width: 100%;
+    height: 30px;
+    background: rgba(0, 0, 0, 0.9);
+    border-top: 2px solid var(--army);
+    display: flex;
+    align-items: center;
+    z-index: 2000;
+    overflow: hidden;
+    font-size: 0.85em;
+    font-weight: bold;
+    letter-spacing: 1px;
+}
+
+/* Der statische rote/grüne "Status"-Block vorne */
+.news-title {
+    background: var(--army);
+    color: #fff;
+    padding: 0 15px;
+    height: 100%;
+    display: flex;
+    align-items: center;
+    white-space: nowrap;
+    z-index: 2001;
+    border-right: 2px solid var(--accent);
+    text-transform: uppercase;
+}
+
+/* Container für die Laufschrift */
+.ticker-wrapper {
+    flex-grow: 1;
+    overflow: hidden;
+    display: flex;
+    align-items: center;
+}
+
+.ticker-text {
+    display: inline-block;
+    white-space: nowrap;
+    padding-left: 100%; /* Startet außerhalb des Sichtfelds */
+    animation: ticker 30s linear infinite;
+    color: var(--accent);
+    text-transform: uppercase;
+}
+
+.ticker-item {
+    display: inline-block;
+    padding-right: 50px;
+}
+
+.ticker-item::before {
+    content: " [ +++ ] ";
+    color: var(--army);
+    margin-right: 10px;
+}
+
+/* Die Animation */
+@keyframes ticker {
+    0% { transform: translate3d(0, 0, 0); }
+    100% { transform: translate3d(-100%, 0, 0); }
+}
+</style>
 </head>
 <body>
 
     <nav class="top-nav">
         <a href="../index.html">[ HUB ]</a>
         <a href="community.html" style="background: rgba(0,255,65,0.1); border-color: var(--accent);">[ Pepe Battalion ]</a>
+        <a href="../htmls/Rankings.html">[ CHAIN OF COMMAND ]</a>
     </nav>
 
     <div class="card">
@@ -110,6 +178,20 @@
             COPYRIGHT &copy; 2026 TACTICAL COMMAND CONTROL - ALL RIGHTS RESERVED
         </div>
     </div>
+
+    <footer class="news-flash-footer">
+        <div class="news-title">Intel Feed</div>
+        <div class="ticker-wrapper">
+            <div class="ticker-text">
+                <span class="ticker-item">Operation PEPE BATTALION: All Systems Nominal</span>
+                <span class="ticker-item">Status: Recruiting new Operators...</span>
+                <span class="ticker-item">Intel: Next Tournament Deployment scheduled for 2000 Hours</span>
+                <span class="ticker-item">Warning: Enemy Movement detected in sector 7G</span>
+                <span class="ticker-item">Breaking: Commander PEPE promotes 3 new Sergeants</span>
+                <span class="ticker-item">Weather: High Visibility for tactical insertions</span>
+            </div>
+        </div>
+    </footer>
 
 </body>
 </html>

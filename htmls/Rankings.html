@@ -1,0 +1,208 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Tactical Command | Community</title>
+    <style>
+        :root { 
+            --accent: #00ff41; --army: #4b5320; --bright: #a3b18a;
+            --panel-bg: rgba(10, 15, 10, 0.98);
+        }
+        body { 
+            font-family: 'Courier New', monospace; background: #ffffff; color: var(--accent); 
+            margin: 0; padding-top: 90px; display: flex; flex-direction: column; align-items: center;
+            padding-bottom: 60px; /* Platz für den Footer */
+        }
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), rgba(0,0,0,0.8);
+            background-size: 100% 4px; z-index: -1; pointer-events: none;
+        }
+        
+        .top-nav, .card { position: relative; z-index: 10; }
+
+        /* Navigation */
+        .top-nav, .card { position: relative; z-index: 10; }
+
+        /* Navigation */
+        .top-nav { position: fixed; top: 0; left: 0; width: 100%; background: rgba(10, 15, 10, 0.95); border-bottom: 1px solid var(--army); z-index: 1000; display: flex; justify-content: center; gap: 10px; padding: 12px 0; }
+        .top-nav a { color: var(--accent); text-decoration: none; font-size: 0.75em; font-weight: bold; padding: 6px 12px; border: 1px solid transparent; text-transform: uppercase; }
+        .top-nav a:hover { border: 1px solid var(--accent); background: rgba(0, 255, 65, 0.1); }
+
+        /* Card & Header */
+        .card { 
+            background: var(--panel-bg); padding: 40px; border: 1px solid var(--army); 
+            width: 90%; max-width: 1000px; box-shadow: 0 0 40px #000; 
+        }
+
+        .header-box {
+            border-bottom: 2px solid var(--army);
+            padding-bottom: 10px;
+            margin-bottom: 40px;
+        }
+
+        h1 {
+            margin: 0;
+            font-size: 1.7em; 
+            letter-spacing: 5px;
+            text-shadow: 0 0 10px var(--accent);
+            text-transform: uppercase;
+        }
+
+        .restr {
+            font-size: 0.60em;
+            color: var(--army); /* Dunkleres Grün */
+            letter-spacing: 2px;
+            font-weight: bold;
+            text-transform: uppercase;
+            opacity: 0.9;
+            text-shadow: none; /* Kein Glow für den Restricted Text */
+            display: block;
+            margin-top: 5px;
+        }
+        
+        /* HIERARCHY & AVATARS */
+        .hierarchy-section { display: flex; flex-direction: column; align-items: center; gap: 60px; margin-top: 20px; }
+        .rank-level { display: flex; justify-content: center; gap: 40px; flex-wrap: wrap; width: 100%; }
+        
+        .member-node { text-align: center; width: 180px; transition: all 0.3s ease; }
+        
+        .avatar { 
+            width: 130px; height: 130px; border-radius: 50%; 
+            border: 2px solid var(--accent); /* Innerer Leuchtring */
+            outline: 4px solid var(--army);  /* Äußerer dunkler Abgrenzungsring */
+            outline-offset: 3px;
+            background: #111;
+            object-fit: cover; margin-bottom: 15px;
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+        }
+
+        .member-node:hover .avatar {
+            transform: scale(1.05);
+            box-shadow: 0 0 30px rgba(0, 255, 65, 0.4);
+            outline-color: var(--accent);
+        }
+
+        .member-name { font-weight: bold; font-size: 1.1em; display: block; color: #fff; text-shadow: 0 0 5px rgba(255,255,255,0.2); }
+        .member-role { font-size: 0.85em; text-transform: uppercase; color: var(--accent); opacity: 0.8; }
+
+        /* ROLE SYSTEM BOX */
+        .role-intel {
+            margin-top: 80px; padding: 25px; border: 1px dashed var(--army);
+            background: rgba(75, 83, 32, 0.1);
+        }
+        .role-intel h3 { margin-top: 0; color: #fff; border-left: 4px solid var(--accent); padding-left: 10px; }
+        .role-list { list-style: none; padding: 0; }
+        .role-list li { margin-bottom: 10px; padding-left: 20px; position: relative; }
+        .role-list li::before { content: "►"; position: absolute; left: 0; color: var(--accent); font-size: 0.8em; top: 3px; }
+
+        /* FOOTER NEWS FLASH */
+        .news-flash-footer {
+            position: fixed; bottom: 0; left: 0; width: 100%; height: 30px;
+            background: rgba(0, 0, 0, 0.95); border-top: 2px solid var(--army);
+            display: flex; align-items: center; z-index: 2000; overflow: hidden;
+            font-size: 0.8em; font-weight: bold; letter-spacing: 1px;
+        }
+        .news-title {
+            background: var(--army); color: #fff; padding: 0 15px; height: 100%;
+            display: flex; align-items: center; white-space: nowrap; z-index: 2001;
+            border-right: 2px solid var(--accent); text-transform: uppercase;
+        }
+        .ticker-wrapper { flex-grow: 1; overflow: hidden; display: flex; align-items: center; }
+        .ticker-text {
+            display: inline-block; white-space: nowrap; padding-left: 100%;
+            animation: ticker 40s linear infinite; color: var(--accent); text-transform: uppercase;
+        }
+        .ticker-item { display: inline-block; padding-right: 60px; }
+        .ticker-item::before { content: " [ +++ ] "; color: var(--army); margin-right: 10px; }
+
+        @keyframes ticker {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <a href="../index.html">[ HUB ]</a>
+        <a href="community.html">[ PEPE BATTALION ]</a>
+        <a href="Rankings.html" style="border-color: var(--accent); background: rgba(0, 255, 65, 0.1);">[ CHAIN OF COMMAND ]</a>
+    </nav>
+
+    <div class="card">
+        <div class="header-box">
+            <h1>CHAIN OF COMMAND</h1>
+            <span class="restr">DOCUMENT #464-BRAVO // RESTRICTED ACCESS</span>
+        </div>
+
+        <div class="hierarchy-section">
+            <div class="rank-level">
+                <div class="member-node">
+                    <img src="../pics/warpepe.gif" alt="Avatar" class="avatar">
+                    <span class="member-name">TIM JOYNER</span>
+                    <span class="member-role">Founder / Supreme Commander</span>
+                </div>
+            </div>
+
+            <div class="rank-level">
+                <div class="member-node">
+                    <img src="../pics/Domi.png" alt="Avatar" class="avatar">
+                    <span class="member-name">D0MIN4TION</span>
+                    <span class="member-role">Colonel / Community Lead</span>
+                </div>
+                <div class="member-node">
+                    <img src="../pics/bernard.jpg" alt="Avatar" class="avatar">
+                    <span class="member-name">Bernard</span>
+                    <span class="member-role">Colonel / Technical Lead</span>
+                </div>
+            </div>
+
+            <div class="rank-level">
+                <div class="member-node">
+                    <img src="../pics/alim.gif" alt="Avatar" class="avatar">
+                    <span class="member-name">DAMNALIM_X</span>
+                    <span class="member-role">Major / Tech Support</span>
+                </div>
+                <div class="member-node">
+                    <img src="../pics/higherthanu.png" alt="Avatar" class="avatar">
+                    <span class="member-name">HIGHERTHANYOU</span>
+                    <span class="member-role">Major / Moderator</span>
+                </div>
+                <div class="member-node">
+                    <img src="../pics/catey.png" alt="Avatar" class="avatar">
+                    <span class="member-name">CATEY</span>
+                    <span class="member-role">Major / Moderator</span>
+                </div>
+            </div>
+        </div>
+
+        <div class="role-intel">
+            <h3>BATTALION RANKING SYSTEM (INTEL)</h3>
+            <p>Unser Rollensystem basiert auf aktiver Dienstzeit und Leistung. Jede Beförderung muss vom High Command autorisiert werden.</p>
+            <ul class="role-list">
+                <li><strong>High Command (General):</strong> Strategische Leitung und finale Instanz.</li>
+                <li><strong>Officers (Colonel/Major):</strong> Operations-Sicherheit und Turnierleitung.</li>
+                <li><strong>Veterans (Captain):</strong> Erfahrene Kämpfer mit Sonderstatus.</li>
+                <li><strong>Soldiers (Sergeant):</strong> Aktive Mitglieder im regelmäßigen Einsatz.</li>
+                <li><strong>Recruits (Private):</strong> Neuankömmlinge in der Ausbildung.</li>
+            </ul>
+        </div>
+    </div>
+
+    <footer class="news-flash-footer">
+        <div class="news-title">Intel Feed</div>
+        <div class="ticker-wrapper">
+            <div class="ticker-text">
+                <span class="ticker-item">Operation PEPE BATTALION: All Systems Nominal</span>
+                <span class="ticker-item">Status: Recruiting new Operators...</span>
+                <span class="ticker-item">Intel: Next Tournament Deployment scheduled for 2000 Hours</span>
+                <span class="ticker-item">Warning: Enemy Movement detected in sector 7G</span>
+                <span class="ticker-item">Breaking: Commander PEPE promotes 3 new Sergeants</span>
+                <span class="ticker-item">Weather: High Visibility for tactical insertions</span>
+            </div>
+        </div>
+    </footer>
+
+</body>
+</html>
