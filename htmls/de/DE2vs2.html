@@ -1,0 +1,223 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Tactical Command | Double Elimination</title>
+    <style>
+        :root { 
+            --accent: #00ff41; --army: #4b5320; --bright: #a3b18a;
+            --panel-bg: rgba(10, 15, 10, 0.98);
+        }
+        body { 
+            font-family: 'Courier New', monospace; background: #ffffff; color: var(--accent); 
+            margin: 0; padding-top: 90px; display: flex; flex-direction: column; align-items: center; min-height: 100vh;
+        }
+        body::before {
+            content: ""; position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), rgba(0,0,0,0.8);
+            background-size: 100% 4px; z-index: -1; pointer-events: none;
+        }
+        .top-nav {
+            position: fixed; top: 0; left: 0; width: 100%; height: 60px;
+            background: var(--panel-bg); border-bottom: 2px solid var(--army);
+            z-index: 1000; display: flex; justify-content: center; align-items: center; gap: 20px;
+        }
+        .top-nav a { color: var(--accent); text-decoration: none; font-weight: bold; padding: 10px; text-transform: uppercase; border: 1px solid transparent; }
+        .card { background: var(--panel-bg); padding: 30px; border: 2px solid var(--army); width: 95%; max-width: 1500px; box-shadow: 0 0 40px #000; margin-bottom: 50px; position: relative; z-index: 10; }
+        h1 { text-align: center; letter-spacing: 5px; text-shadow: 0 0 10px var(--accent); }
+        .setup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 15px; margin: 25px 0; }
+        .team-input-box { border: 1px solid var(--army); padding: 15px; background: rgba(0,0,0,0.5); }
+        input, select { background: #000; border: 1px solid var(--army); color: var(--accent); padding: 8px; width: 100%; box-sizing: border-box; margin-top: 5px; font-family: inherit; }
+        button { background: var(--army); color: white; border: 1px solid var(--accent); padding: 12px 30px; cursor: pointer; text-transform: uppercase; font-weight: bold; margin-top: 20px; }
+        .section-label { background: var(--army); color: white; padding: 10px; text-align: center; letter-spacing: 3px; text-transform: uppercase; margin: 40px 0 10px 0; }
+        .bracket-scroll { display: flex; gap: 40px; padding: 20px; overflow-x: auto; justify-content: flex-start; }
+        .round { display: flex; flex-direction: column; justify-content: space-around; min-width: 300px; }
+        .match { background: rgba(0,0,0,0.9); border: 1px solid var(--army); padding: 12px; margin: 10px 0; }
+        .match-row { display: flex; justify-content: space-between; align-items: center; padding: 5px 0; border-bottom: 1px solid rgba(75,83,32,0.3); }
+        .score-box { width: 45px; background: var(--accent); color: #000; border: none; text-align: center; font-weight: bold; }
+        #champion-display { margin-top: 40px; padding: 40px; border: 4px double var(--accent); background: rgba(0, 255, 65, 0.05); text-align: center; display: none; }
+        .hidden { display: none; }
+    </style>
+</head>
+<body>
+
+    <nav class="top-nav">
+        <a href="../../index.html">[ HUB ]</a>
+        <a href="DE1vs1.html">[ 1VS1 ]</a>
+        <a href="DE2vs2.html">[ 2VS2 ]</a>
+        <a href="DE3vs3.html">[ 3VS3 ]</a>
+        <a href="DE5vs5.html">[ 5VS5 ]</a>
+    </nav>
+
+    <div class="card" id="step1">
+        <h1 id="mode-title">TACTICAL OPERATIONS</h1>
+        <center>
+            <div style="display:flex; justify-content:center; gap:30px;">
+                <div>
+                    <label>SQUAD COUNT:</label><br>
+                    <select id="teamCount" onchange="initSetup()">
+                        <option value="4">4 TEAMS</option>
+                        <option value="8" selected>8 TEAMS</option>
+                    </select>
+                </div>
+                <div>
+                    <label>BEST OF:</label><br>
+                    <select id="boSelect">
+                        <option value="1">Bo1</option>
+                        <option value="3" selected>Bo3</option>
+                        <option value="5">Bo5</option>
+                    </select>
+                </div>
+            </div>
+            <button onclick="startMission()">System Initialisieren</button>
+        </center>
+        <div id="input-area" class="setup-grid"></div>
+    </div>
+
+    <div id="tournament-screen" class="card hidden">
+        <div class="section-label">Winners Bracket</div>
+        <div id="winners-bracket" class="bracket-scroll"></div>
+        <div class="section-label">Losers Bracket</div>
+        <div id="losers-bracket" class="bracket-scroll"></div>
+        <div class="section-label" style="border: 2px solid var(--accent);">Grand Final</div>
+        <div id="grand-final" class="bracket-scroll" style="justify-content:center;"></div>
+        
+        <div id="champion-display">
+            <h2 style="letter-spacing:10px;">★ CHAMPION EXTRACTION ★</h2>
+            <div id="champ-name" style="font-size: 3em; font-weight: bold; color: #fff;">---</div>
+            <div id="champ-ops" style="font-size: 1.2em; color: var(--accent);">---</div>
+        </div>
+        
+        <center><button onclick="location.reload()" style="background:#444; margin-top:40px;">Reset Operation</button></center>
+    </div>
+
+    <script>
+        /* ================================================================*/
+        const pPerTeam = 2; 
+        /* ================================================================ */
+
+        let winsNeeded = 2;
+        let teams = [];
+        let count = 8;
+
+        document.getElementById('mode-title').innerText = `SQUAD OPERATIONS ${pPerTeam}VS${pPerTeam}`;
+
+        function initSetup() {
+            count = parseInt(document.getElementById('teamCount').value);
+            const area = document.getElementById('input-area');
+            area.innerHTML = '';
+            for(let i=1; i<=count; i++) {
+                let opInputs = '';
+                for(let p=1; p<=pPerTeam; p++) {
+                    opInputs += `<input type="text" id="t${i}_p${p}" value="Operator ${p}">`;
+                }
+                area.innerHTML += `
+                    <div class="team-input-box">
+                        <strong>SQUAD ${i}</strong>
+                        <input type="text" id="t${i}_n" value="Team ${i}">
+                        ${opInputs}
+                    </div>`;
+            }
+        }
+
+        function startMission() {
+            const bo = parseInt(document.getElementById('boSelect').value);
+            winsNeeded = Math.ceil((bo + 1) / 2);
+            teams = [];
+            for(let i=1; i<=count; i++) {
+                let ops = [];
+                for(let p=1; p<=pPerTeam; p++) {
+                    ops.push(document.getElementById(`t${i}_p${p}`).value);
+                }
+                teams.push({ 
+                    name: document.getElementById(`t${i}_n`).value, 
+                    ops: ops.join(' | ') 
+                });
+            }
+            renderBrackets();
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('tournament-screen').classList.remove('hidden');
+        }
+
+        function renderBrackets() {
+            const wb = document.getElementById('winners-bracket');
+            const lb = document.getElementById('losers-bracket');
+            if(count === 8) {
+                wb.innerHTML = createRound("W-Viertel", 4, "W1") + createRound("W-Halb", 2, "W2") + createRound("W-Finale", 1, "W3");
+                lb.innerHTML = createRound("L-R1", 2, "L1") + createRound("L-R2", 2, "L2") + createRound("L-R3", 1, "L3") + createRound("L-Finale", 1, "L4");
+            } else {
+                wb.innerHTML = createRound("W-Halb", 2, "W1") + createRound("W-Finale", 1, "W2");
+                lb.innerHTML = createRound("L-R1", 1, "L1") + createRound("L-Finale", 1, "L2");
+            }
+            document.getElementById('grand-final').innerHTML = createRound("Grand Final", 1, "GF");
+            for(let i=0; i<(count/2); i++) {
+                updateSlot("W1", i, 0, teams[i*2]);
+                updateSlot("W1", i, 1, teams[i*2+1]);
+            }
+        }
+
+        function createRound(label, num, rId) {
+            let html = `<div class="round"><div style="text-align:center; font-size:0.7em; opacity:0.5;">${label}</div>`;
+            for(let i=0; i<num; i++) {
+                html += `
+                <div class="match">
+                    <div class="match-row">
+                        <span id="${rId}_m${i}_t0_n">Warten...</span>
+                        <span id="${rId}_m${i}_t0_o" class="hidden"></span>
+                        <input type="number" class="score-box" id="${rId}_m${i}_s0" oninput="logic('${rId}',${i})">
+                    </div>
+                    <div class="match-row">
+                        <span id="${rId}_m${i}_t1_n">Warten...</span>
+                        <span id="${rId}_m${i}_t1_o" class="hidden"></span>
+                        <input type="number" class="score-box" id="${rId}_m${i}_s1" oninput="logic('${rId}',${i})">
+                    </div>
+                </div>`;
+            }
+            return html + "</div>";
+        }
+
+        function updateSlot(r, m, t, data) {
+            const n = document.getElementById(`${r}_m${m}_t${t}_n`);
+            const o = document.getElementById(`${r}_m${m}_t${t}_o`);
+            if(n && data) { n.innerText = data.name; o.innerText = data.ops; }
+        }
+
+        function logic(r, m) {
+            const s0 = parseInt(document.getElementById(`${r}_m${m}_s0`).value) || 0;
+            const s1 = parseInt(document.getElementById(`${r}_m${m}_s1`).value) || 0;
+            if (s0 >= winsNeeded || s1 >= winsNeeded) {
+                const wIdx = s0 > s1 ? 0 : 1;
+                const lIdx = s0 > s1 ? 1 : 0;
+                const win = { name: document.getElementById(`${r}_m${m}_t${wIdx}_n`).innerText, ops: document.getElementById(`${r}_m${m}_t${wIdx}_o`).innerText };
+                const los = { name: document.getElementById(`${r}_m${m}_t${lIdx}_n`).innerText, ops: document.getElementById(`${r}_m${m}_t${lIdx}_o`).innerText };
+                if(win.name === "Warten...") return;
+                
+                if(count === 8) {
+                    if(r === "W1") { updateSlot("W2", Math.floor(m/2), m%2, win); updateSlot("L1", Math.floor(m/2), m%2, los); }
+                    else if(r === "L1") { updateSlot("L2", m, 0, win); }
+                    else if(r === "W2") { updateSlot("W3", 0, m, win); updateSlot("L2", m, 1, los); }
+                    else if(r === "L2") { updateSlot("L3", 0, m, win); }
+                    else if(r === "L3") { updateSlot("L4", 0, 0, win); }
+                    else if(r === "W3") { updateSlot("GF", 0, 0, win); updateSlot("L4", 0, 1, los); }
+                    else if(r === "L4") { updateSlot("GF", 0, 1, win); }
+                    else if(r === "GF") { showChamp(win); }
+                } else {
+                    if(r === "W1") { updateSlot("W2", 0, m, win); updateSlot("L1", 0, m, los); }
+                    else if(r === "W2") { updateSlot("GF", 0, 0, win); updateSlot("L2", 0, 1, los); }
+                    else if(r === "L1") { updateSlot("L2", 0, 0, win); }
+                    else if(r === "L2") { updateSlot("GF", 0, 1, win); }
+                    else if(r === "GF") { showChamp(win); }
+                }
+            }
+        }
+
+        function showChamp(team) {
+            document.getElementById('champion-display').style.display = "block";
+            document.getElementById('champ-name').innerText = team.name;
+            document.getElementById('champ-ops').innerText = team.ops;
+            window.scrollTo({ top: document.body.scrollHeight, behavior: 'smooth' });
+        }
+        initSetup();
+    </script>
+</body>
+</html>
