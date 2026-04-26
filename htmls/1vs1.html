@@ -1,0 +1,236 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Tactical Duel Control | 1vs1</title>
+    <style>
+        :root { 
+            --army-green: #4b5320; 
+            --bright-green: #a3b18a; 
+            --neon-green: #00ff41; 
+            --card-bg: rgba(15, 20, 10, 0.95);
+        }
+
+        body { 
+            font-family: 'Courier New', monospace; 
+            background-color: #a7a7a7;
+            background-image: url('DEIN_HINTERGRUND.gif'); 
+            background-size: cover;
+            background-attachment: fixed;
+            color: var(--neon-green); 
+            margin: 0;
+            padding-top: 80px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        /* Abdunklung und Scanlines */
+        .overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8); /* Abdunklung */
+            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%); /* Pixel-Scanlines */
+            background-size: 100% 4px;
+            z-index: 1;
+            pointer-events: none;
+        }
+
+        .top-nav {
+            position: fixed; top: 0; left: 0; width: 100%;
+            background: rgba(10, 15, 10, 0.95); border-bottom: 1px solid var(--army-green);
+            z-index: 9999; display: flex; justify-content: center; gap: 10px; padding: 12px 0;
+        }
+        .top-nav a {
+            color: var(--neon-green); text-decoration: none; font-size: 0.75em;
+            font-weight: bold; padding: 6px 12px; text-transform: uppercase; border: 1px solid transparent;
+        }
+
+        h1, .card { position: relative; z-index: 10; }
+
+        .card { 
+            background: var(--card-bg); padding: 25px; 
+            border: 2px solid var(--army-green); width: 95%; 
+            max-width: 1400px; box-shadow: 0 0 20px rgba(0,0,0,0.8);
+            margin-bottom: 50px;
+        }
+
+        .bracket-wrapper { 
+            display: flex; 
+            justify-content: flex-start;
+            gap: 40px; 
+            padding: 20px;
+        }
+
+        .round { 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: space-around;
+            min-width: 250px; 
+        }
+
+        .label { 
+            background: var(--army-green); 
+            color: white; padding: 5px; text-align: center; 
+            margin-bottom: 10px; font-size: 0.8em; border: 1px solid var(--bright-green);
+        }
+
+        .match { 
+            background: rgba(0, 0, 0, 0.8); 
+            border: 1px solid var(--army-green); padding: 10px; 
+            margin: 15px 0;
+        }
+
+        .player-row { 
+            display: flex; justify-content: space-between; 
+            align-items: center; margin: 5px 0; padding-bottom: 3px;
+            border-bottom: 1px solid rgba(75, 83, 32, 0.3);
+        }
+        .player-row:last-child { border-bottom: none; }
+
+        .score-input { 
+            width: 45px !important; background: var(--neon-green) !important; 
+            color: black !important; font-weight: bold; text-align: center; border: none;
+        }
+        
+        .hidden { display: none; }
+        #champion-box { 
+            border: 2px solid var(--neon-green); padding: 20px; 
+            text-align: center; background: rgba(0, 255, 65, 0.05);
+        }
+
+        .setup-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(180px, 1fr)); gap: 10px; margin: 20px 0; }
+        button { background: var(--army-green); color: white; border: 1px solid var(--bright-green); padding: 10px 20px; cursor: pointer; font-family: inherit; }
+    </style>
+</head>
+<body>
+
+    <div class="overlay"></div>
+
+    <nav class="top-nav">
+        <a href="../index.html">[ HUB ]</a>
+        <a href="1vs1.html" style="background: rgba(0,255,65,0.1); border-color: var(--neon-green);">[ 1VS1 ]</a>
+        <a href="2vs2.html">[ 2VS2 ]</a>
+        <a href="3vs3.html">[ 3VS3 ]</a>
+        <a href="5vs5.html">[ 5VS5 ]</a>
+    </nav>
+
+    <h1>[ 1VS1 DUEL OPERATIONS ]</h1>
+
+    <div id="step1" class="card">
+        <div style="text-align:center;">
+            <select id="playerCount" onchange="initSetup()" style="padding:10px;">
+                <option value="2">2 Player</option>
+                <option value="4">4 Player</option>
+                <option value="8" selected>8 Player</option>
+                <option value="16">16 Player</option>
+            </select>
+            <select id="boMode" style="padding:10px;">
+                <option value="1">Bo1</option>
+                <option value="3" selected>Bo3</option>
+                <option value="5">Bo5</option>
+            </select>
+        </div>
+        <div id="input-area" class="setup-grid"></div>
+        <center><button onclick="startMission()">Duel Starten</button></center>
+    </div>
+
+    <div id="tournament-screen" class="card hidden">
+        <div id="bracket" class="bracket-wrapper"></div>
+        <center><button onclick="location.reload()" style="background:#444; margin-top:20px;">Reset</button></center>
+    </div>
+
+    <script>
+        let reqWins = 2;
+
+        function initSetup() {
+            const count = document.getElementById('playerCount').value;
+            const area = document.getElementById('input-area');
+            area.innerHTML = '';
+            for (let i = 1; i <= count; i++) {
+                area.innerHTML += `<div class="team-input-box"><small>UNIT ${i}</small><input type="text" id="p${i}_n" value="Operator ${i}"></div>`;
+            }
+        }
+
+        function startMission() {
+            const count = parseInt(document.getElementById('playerCount').value);
+            const bo = parseInt(document.getElementById('boMode').value);
+            reqWins = Math.ceil((bo + 1) / 2);
+            if(bo === 1) reqWins = 1;
+
+            const players = [];
+            for (let i = 1; i <= count; i++) {
+                players.push(document.getElementById(`p${i}_n`).value || `P${i}`);
+            }
+
+            buildBracket(count, players);
+            document.getElementById('step1').classList.add('hidden');
+            document.getElementById('tournament-screen').classList.remove('hidden');
+        }
+
+        function buildBracket(count, players) {
+            const bracket = document.getElementById('bracket');
+            bracket.innerHTML = '';
+            let rounds = ["Finale"];
+            if (count > 2) rounds.unshift("Halbfinale");
+            if (count > 4) rounds.unshift("Viertelfinale");
+            if (count > 8) rounds.unshift("Achtelfinale");
+
+            rounds.forEach((rName, rIdx) => {
+                const roundDiv = document.createElement('div');
+                roundDiv.className = 'round';
+                
+                let html = `<div class="label">${rName}</div>`;
+                const mCount = Math.pow(2, rounds.length - rIdx - 1);
+                
+                for (let m = 0; m < mCount; m++) {
+                    const mId = `r${rIdx}_m${m}`;
+                    const nId = (rIdx === rounds.length - 1) ? 'champ' : `r${rIdx+1}_m${Math.floor(m/2)}_t${m%2}`;
+                    const name0 = (rIdx === 0) ? players[m * 2] : 'Warten...';
+                    const name1 = (rIdx === 0) ? players[m * 2 + 1] : 'Warten...';
+
+                    html += `
+                        <div class="match" data-m="${mId}" data-n="${nId}">
+                            <div class="player-row">
+                                <span id="${mId}_t0_name">${name0}</span>
+                                <input type="number" class="score-input" id="${mId}_s0" value="0" oninput="updateDuel('${mId}','${nId}')">
+                            </div>
+                            <div class="player-row">
+                                <span id="${mId}_t1_name">${name1}</span>
+                                <input type="number" class="score-input" id="${mId}_s1" value="0" oninput="updateDuel('${mId}','${nId}')">
+                            </div>
+                        </div>`;
+                }
+                roundDiv.innerHTML = html;
+                bracket.appendChild(roundDiv);
+            });
+            
+            bracket.innerHTML += `<div class="round"><div class="label">SIEGER</div><div id="champion-box">---</div></div>`;
+        }
+
+        function updateDuel(mId, nId) {
+            const s0 = parseInt(document.getElementById(mId + '_s0').value) || 0;
+            const s1 = parseInt(document.getElementById(mId + '_s1').value) || 0;
+
+            if ((s0 >= reqWins || s1 >= reqWins) && s0 !== s1) {
+                const winIdx = s0 > s1 ? 0 : 1;
+                const winner = document.getElementById(`${mId}_t${winIdx}_name`).innerText;
+                if (winner === "Warten...") return;
+
+                if (nId === 'champ') {
+                    document.getElementById('champion-box').innerHTML = '★ ' + winner + ' ★';
+                } else {
+                    document.getElementById(nId + '_name').innerText = winner;
+                }
+            }
+        }
+
+        initSetup();
+    </script>
+</body>
+</html>
