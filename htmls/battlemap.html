@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+    <meta charset="UTF-8">
+    <title>Battlemap // Pepe Battalion</title>
+    <style>
+        :root {
+            --accent: #00ff41;
+            --army: #4b5320;
+            --glow: rgba(0, 255, 65, 0.4);
+            --colonel: #ff4141;
+            --major: #ffcc00;
+            --officer: #41c8ff;
+            --soldier: #00ff41;
+            --recruit: #aaaaaa;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #050a05;
+            background-image:
+                linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--accent);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+            padding: 20px;
+            padding-top: 90px;
+            padding-bottom: 60px;
+        }
+
+        /* scanline overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.07) 2px,
+                rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
+        }
+
+        /* ── Navigation ── */
+        .top-nav {
+            position: fixed; top: 0; left: 0;
+            width: 100%;
+            background: rgba(10, 15, 10, 0.97);
+            border-bottom: 1px solid var(--army);
+            z-index: 1000;
+            display: flex; justify-content: center; gap: 10px;
+            padding: 12px 0;
+        }
+        .top-nav a {
+            color: var(--accent); text-decoration: none;
+            font-size: 0.75em; font-weight: bold;
+            padding: 6px 12px;
+            border: 1px solid transparent;
+            text-transform: uppercase;
+        }
+        .top-nav a:hover { border: 1px solid var(--accent); background: rgba(0,255,65,0.1); }
+        .top-nav a.active { background: rgba(0,255,65,0.1); border-color: var(--accent); }
+
+        /* ── Card wrapper ── */
+        .card {
+            background: rgba(15, 20, 10, 0.92);
+            padding: 30px;
+            border: 1px solid var(--army);
+            width: 95%;
+            max-width: 1100px;
+            box-shadow: 0 0 40px #000, 0 0 80px rgba(0,255,65,0.03);
+            position: relative; z-index: 10;
+        }
+
+        .header-box {
+            border-bottom: 2px solid var(--army);
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .header-box h1 {
+            font-size: 1.8em; letter-spacing: 4px;
+            text-shadow: 0 0 10px var(--accent);
+        }
+        .header-box span { font-size: 0.65em; color: var(--army); font-weight: bold; }
+
+        /* ── Battlemap canvas area ── */
+        #map-container {
+            position: relative;
+            z-index: 1; /* Wichtig für das Hintergrundbild */
+            width: 100%;
+            height: 520px;
+            border: 1px solid var(--army);
+            background:
+                /* terrain overlays */
+                radial-gradient(ellipse 30% 20% at 20% 30%, rgba(75,83,32,0.18) 0%, transparent 70%),
+                radial-gradient(ellipse 25% 30% at 75% 60%, rgba(75,83,32,0.15) 0%, transparent 70%),
+                radial-gradient(ellipse 20% 25% at 55% 20%, rgba(75,83,32,0.12) 0%, transparent 70%),
+                /* grid */
+                linear-gradient(rgba(0,255,65,0.06) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,65,0.06) 1px, transparent 1px),
+                #0a0f0a;
+            background-size: auto, auto, auto, 50px 50px, 50px 50px;
+            overflow: hidden;
+            margin-bottom: 6px;
+        }
+
+        /* ── DEIN HINTERGRUNDBILD ── */
+        #map-container::before {
+            content: "";
+            position: absolute;
+            top: 0; left: 0; 
+            width: 100%; height: 100%;
+            z-index: -1; /* Legt das Bild HINTER das Grid und die Terrain-Farben */
+            
+            /* HIER DEINEN BILD-LINK EINTRAGEN: */
+            background-image: url('../pics/battlemap.png'); /* z.B. url('bilder/meine-karte.jpg') */
+            
+            background-size: cover;
+            background-position: center;
+            opacity: 0.6; /* Transparenz: 1.0 ist voll sichtbar, 0.0 ist unsichtbar */
+        }
+
+        /* coordinate labels */
+        .coord-x, .coord-y {
+            position: absolute;
+            font-size: 0.5em;
+            color: rgba(75,83,32,0.6);
+            font-weight: bold;
+        }
+
+        /* compass */
+        .compass {
+            position: absolute; top: 12px; right: 12px;
+            width: 50px; height: 50px;
+            border: 1px solid var(--army);
+            border-radius: 50%;
+            display: flex; align-items: center; justify-content: center;
+            font-size: 0.65em; font-weight: bold;
+            background: rgba(0,0,0,0.7);
+            z-index: 5;
+        }
+        .compass-n { color: var(--accent); text-shadow: 0 0 5px var(--accent); }
+
+        /* sector labels */
+        .sector-label {
+            position: absolute;
+            font-size: 0.55em;
+            color: rgba(75,83,32,0.45);
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            pointer-events: none;
+        }
+
+        /* terrain features */
+        .terrain {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        .terrain-forest {
+            background: rgba(30,60,15,0.4);
+            border: 1px solid rgba(75,83,32,0.3);
+        }
+        .terrain-urban {
+            background: rgba(50,50,40,0.35);
+            border: 1px solid rgba(100,100,80,0.25);
+            border-radius: 4px;
+        }
+
+        /* ping animation on map */
+        .map-ping {
+            position: absolute;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            z-index: 4;
+            cursor: pointer;
+        }
+        .map-ping::before {
+            content: '';
+            position: absolute;
+            top: 50%; left: 50%;
+            width: 8px; height: 8px;
+            border-radius: 50%;
+            transform: translate(-50%, -50%);
+            animation: pingPulse 2s ease-out infinite;
+        }
+        @keyframes pingPulse {
+            0%   { transform: translate(-50%,-50%) scale(1); opacity: 0.8; }
+            100% { transform: translate(-50%,-50%) scale(4); opacity: 0; }
+        }
+
+        .map-ping .ping-label {
+            position: absolute;
+            bottom: 12px; /* Setzt das Label mit Abstand über den Dot */
+            left: 50%;
+            transform: translateX(-50%);
+            white-space: nowrap;
+            font-size: 0.65em;
+            font-weight: bold;
+            padding: 2px 6px;
+            background: rgba(0,0,0,0.85);
+            border: 1px solid;
+            pointer-events: none;
+            z-index: 10;
+        }
+        .map-ping .ping-role-icon {
+            position: absolute;
+            bottom: -18px; left: 50%;
+            transform: translateX(-50%);
+            font-size: 0.5em;
+            opacity: 0.8;
+            white-space: nowrap;
+        }
+
+        /* Role colors */
+        .role-colonel { color: var(--colonel); }
+        .role-major   { color: var(--major); }
+        .role-officer { color: var(--officer); }
+        .role-soldier { color: var(--soldier); }
+        .role-recruit { color: var(--recruit); }
+
+        .ping-colonel { background: var(--colonel); box-shadow: 0 0 8px var(--colonel); }
+        .ping-colonel::before { background: var(--colonel); }
+        .ping-colonel + .ping-label, .ping-colonel .ping-label { border-color: var(--colonel); color: var(--colonel); }
+
+        .ping-major { background: var(--major); box-shadow: 0 0 8px var(--major); }
+        .ping-major::before { background: var(--major); }
+        .ping-major .ping-label { border-color: var(--major); color: var(--major); }
+
+        .ping-officer { background: var(--officer); box-shadow: 0 0 8px var(--officer); }
+        .ping-officer::before { background: var(--officer); }
+        .ping-officer .ping-label { border-color: var(--officer); color: var(--officer); }
+
+        .ping-soldier { background: var(--accent); box-shadow: 0 0 8px var(--accent); }
+        .ping-soldier::before { background: var(--accent); }
+        .ping-soldier .ping-label { border-color: var(--accent); color: var(--accent); }
+
+        .ping-recruit { background: var(--recruit); box-shadow: 0 0 6px var(--recruit); }
+        .ping-recruit::before { background: var(--recruit); }
+        .ping-recruit .ping-label { border-color: var(--recruit); color: var(--recruit); }
+
+        /* slow drift animation */
+        /* tight wobble animation - keeps operators inside boundaries */
+        @keyframes drift {
+            0%   { transform: translate(-50%, -50%) translate(0px, 0px); }
+            25%  { transform: translate(-50%, -50%) translate(1px, -1px); }
+            50%  { transform: translate(-50%, -50%) translate(-1px, 1px); }
+            75%  { transform: translate(-50%, -50%) translate(1px, 0px); }
+            100% { transform: translate(-50%, -50%) translate(0px, 0px); }
+        }
+
+        /* map status bar */
+        .map-statusbar {
+            display: flex; justify-content: space-between; align-items: center;
+            font-size: 0.6em; color: var(--army);
+            padding: 4px 0 10px;
+            text-transform: uppercase; letter-spacing: 1px;
+        }
+        .map-statusbar span { color: var(--accent); }
+
+        /* ── Online Roster ── */
+        .roster-header {
+            border-top: 2px solid var(--army);
+            border-bottom: 1px solid var(--army);
+            padding: 8px 0;
+            margin-top: 10px;
+            margin-bottom: 14px;
+            display: flex; justify-content: space-between; align-items: center;
+        }
+        .roster-header h3 {
+            font-size: 0.9em; letter-spacing: 3px;
+            text-shadow: 0 0 6px var(--accent);
+            text-transform: uppercase;
+        }
+        .roster-header .update-tag {
+            font-size: 0.6em; color: var(--army);
+        }
+
+        .roster-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 8px;
+        }
+
+        .roster-role-group { margin-bottom: 10px; }
+        .roster-role-title {
+            font-size: 0.65em;
+            font-weight: bold;
+            text-transform: uppercase;
+            letter-spacing: 2px;
+            padding: 3px 8px;
+            margin-bottom: 6px;
+            border-left: 3px solid;
+            background: rgba(0,0,0,0.3);
+        }
+
+        .roster-member {
+            display: flex; align-items: center; gap: 8px;
+            font-size: 0.75em;
+            padding: 5px 10px;
+            border: 1px solid rgba(75,83,32,0.25);
+            background: rgba(0,0,0,0.2);
+            transition: background 0.2s;
+        }
+        .roster-member:hover { background: rgba(0,255,65,0.05); }
+        .roster-member .dot {
+            width: 6px; height: 6px;
+            border-radius: 50%;
+            flex-shrink: 0;
+            animation: blinker 1.8s ease-in-out infinite;
+        }
+        @keyframes blinker { 50% { opacity: 0.2; } }
+
+        /* full 2-col role layout */
+        .roles-layout {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 16px;
+        }
+        @media (max-width: 640px) {
+            .roles-layout { grid-template-columns: 1fr; }
+            #map-container { height: 360px; }
+        }
+
+        .role-block { }
+        .role-block .roster-role-title { display: block; margin-bottom: 6px; }
+        .role-members { display: flex; flex-direction: column; gap: 4px; }
+
+        /* footer ticker */
+        .news-flash-footer {
+            position: fixed; bottom: 0; left: 0;
+            width: 100%; height: 30px;
+            background: rgba(0,0,0,0.95);
+            border-top: 2px solid var(--army);
+            display: flex; align-items: center;
+            z-index: 2000; overflow: hidden;
+            font-size: 0.8em; font-weight: bold; letter-spacing: 1px;
+        }
+        .news-title {
+            background: var(--army); color: #fff;
+            padding: 0 14px; height: 100%;
+            display: flex; align-items: center;
+            white-space: nowrap; z-index: 2001;
+            border-right: 2px solid var(--accent);
+            text-transform: uppercase;
+            font-size: 0.85em;
+        }
+        .ticker-wrapper { flex-grow: 1; overflow: hidden; display: flex; align-items: center; }
+        .ticker-text {
+            display: inline-block; white-space: nowrap;
+            padding-left: 100%;
+            animation: ticker 40s linear infinite;
+            color: var(--accent); text-transform: uppercase;
+        }
+        .ticker-item { display: inline-block; padding-right: 50px; }
+        .ticker-item::before { content: " [ +++ ] "; color: var(--army); margin-right: 10px; }
+        @keyframes ticker {
+            0%   { transform: translate3d(0,0,0); }
+            100% { transform: translate3d(-100%,0,0); }
+        }
+
+        /* legend */
+        .legend {
+            display: flex; gap: 16px; flex-wrap: wrap;
+            font-size: 0.6em; padding: 8px 0;
+            border-bottom: 1px solid rgba(75,83,32,0.3);
+            margin-bottom: 12px;
+        }
+        .legend-item { display: flex; align-items: center; gap: 5px; text-transform: uppercase; letter-spacing: 1px; }
+        .legend-dot { width: 8px; height: 8px; border-radius: 50%; }
+    </style>
+</head>
+<body>
+
+<nav class="top-nav">
+    <a href="../index.html">[ HUB ]</a>
+    <a href="community.html">[ Pepe Battalion ]</a>
+    <a href="battlemap.html" class="active">[ BATTLEMAP ]</a>
+    <a href="../htmls/Rankings.html">[ CHAIN OF COMMAND ]</a>
+</nav>
+
+<div class="card">
+    <div class="header-box">
+        <div>
+            <h1>// TACTICAL BATTLEMAP</h1>
+            <span>LIVE OPERATOR POSITIONING // SECTOR OVERVIEW // CLASSIFIED</span>
+        </div>
+        <span id="clock" style="font-size:0.75em; color: var(--accent);"></span>
+    </div>
+
+    <!-- Legend -->
+    <div class="legend">
+        <div class="legend-item"><div class="legend-dot" style="background:var(--colonel)"></div> <span style="color:var(--colonel)">Colonel</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--major)"></div> <span style="color:var(--major)">Major</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--officer)"></div> <span style="color:var(--officer)">Officer</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--soldier)"></div> <span style="color:var(--soldier)">Soldier</span></div>
+        <div class="legend-item"><div class="legend-dot" style="background:var(--recruit)"></div> <span style="color:var(--recruit)">Recruit</span></div>
+    </div>
+
+    <!-- MAP -->
+    <div id="map-container">
+        <!-- Compass -->
+        <div class="compass"><span class="compass-n">N</span></div>
+
+        <!-- Terrain Features -->
+        <div class="terrain terrain-forest" style="left:8%;top:15%;width:130px;height:80px;"></div>
+        <div class="terrain terrain-forest" style="left:60%;top:55%;width:100px;height:70px;"></div>
+        <div class="terrain terrain-urban" style="left:40%;top:30%;width:80px;height:60px;"></div>
+        <div class="terrain terrain-urban" style="left:72%;top:12%;width:60px;height:50px;"></div>
+        <div class="terrain terrain-forest" style="left:25%;top:65%;width:90px;height:60px;"></div>
+
+        <!-- Sector Labels -->
+        <div class="sector-label" style="left:5%;top:5%;">SECTOR A-1</div>
+        <div class="sector-label" style="left:35%;top:5%;">SECTOR B-1</div>
+        <div class="sector-label" style="left:65%;top:5%;">SECTOR C-1</div>
+        <div class="sector-label" style="left:5%;top:48%;">SECTOR A-2</div>
+        <div class="sector-label" style="left:35%;top:48%;">SECTOR B-2</div>
+        <div class="sector-label" style="left:65%;top:48%;">SECTOR C-2</div>
+        <div class="sector-label" style="left:5%;top:88%;">SECTOR A-3</div>
+        <div class="sector-label" style="left:35%;top:88%;">SECTOR B-3</div>
+        <div class="sector-label" style="left:65%;top:88%;">SECTOR C-3</div>
+
+        <!-- Coordinate X axis -->
+        <script>
+        for(let i=1;i<=9;i++){
+            document.write(`<div class="coord-x" style="left:${i*10}%;bottom:4px;">${String.fromCharCode(64+i)}</div>`);
+        }
+        for(let i=1;i<=9;i++){
+            document.write(`<div class="coord-y" style="top:${i*10}%;left:4px;">${i}</div>`);
+        }
+        </script>
+
+        <!-- Pings injected by JS -->
+    </div>
+
+    <div class="map-statusbar">
+        <div>GRID REF: <span id="grid-ref">B2-ALPHA</span></div>
+        <div>OPERATORS ON MAP: <span id="op-count">0</span></div>
+        <div>LAST UPDATE: <span id="last-update">--:--:--</span></div>
+        <div>ZOOM: <span>1:50.000</span></div>
+    </div>
+
+    <!-- ROSTER -->
+    <div class="roster-header">
+        <h3>📡 Online Roster — Active Operators</h3>
+        <span class="update-tag">AUTO-REFRESH // LIVE DATA SIM</span>
+    </div>
+
+    <div class="roles-layout" id="roster-container"></div>
+</div>
+
+<!-- Footer -->
+<footer class="news-flash-footer">
+    <div class="news-title">Intel Feed</div>
+    <div class="ticker-wrapper">
+        <div class="ticker-text">
+            <span class="ticker-item">Battlemap Online — All Sectors Nominal</span>
+            <span class="ticker-item">Operator Tracking Active — GPS Signal Strong</span>
+            <span class="ticker-item">Colonel Rank: Highest Priority Targets</span>
+            <span class="ticker-item">Recruiting Status: OPEN — Join the Battalion</span>
+            <span class="ticker-item">Next Op debrief at 2000 Hours</span>
+            <span class="ticker-item">Enemy Movement detected in Sector C-2</span>
+        </div>
+    </div>
+</footer>
+
+<script>
+// ── Data ──────────────────────────────────────────────────
+const ROSTER = {
+    colonel: { label: "Colonel", color: "#ff4141", cssClass: "colonel", members: ["Tim Joyner", "Bernard", "Domination"] },
+    major:   { label: "Major",   color: "#ffcc00", cssClass: "major",   members: ["catey", "damnAlim", "Gamerjunge89", "Higherthanu", "Pix3l", "Urlog the Destroyer"] },
+    officer: { label: "Officer", color: "#41c8ff", cssClass: "officer", members: ["Clumsy", "Milka", "shinso"] },
+    soldier: { label: "Soldier", color: "#00ff41", cssClass: "soldier", members: ["Brudi Völler", "Ente", "GamingViking", "Harzersohn", "MCHercules", "r4g7-hg"] },
+    recruit: { label: "Recruit", color: "#aaaaaa", cssClass: "recruit", members: ["jswmz", "hadesalive", "president21", "StaubsauGer", "Tobi Joyner", "Cold", "kazuto237", "hbxSorata", "Medival44", "pummelchen"] }
+};
+
+// ── Image Processing (Spawn Mask) ─────────────────────────
+let spawnCtx = null;
+let spawnCanvasWidth = 0;
+let spawnCanvasHeight = 0;
+
+const spawnMapImg = new Image();
+// HIER DEN DATEINAMEN DEINES FARBIGEN SPAWN-BILDES EINTRAGEN
+// (Muss im selben Ordner liegen oder der Pfad muss stimmen)
+spawnMapImg.src = 'spawn-maske.png'; 
+
+spawnMapImg.onload = () => {
+    // Wenn das Bild geladen ist, zeichnen wir es auf ein unsichtbares Canvas
+    const canvas = document.createElement('canvas');
+    canvas.width = spawnMapImg.width;
+    canvas.height = spawnMapImg.height;
+    spawnCtx = canvas.getContext('2d', { willReadFrequently: true });
+    spawnCtx.drawImage(spawnMapImg, 0, 0);
+    
+    spawnCanvasWidth = canvas.width;
+    spawnCanvasHeight = canvas.height;
+
+    // Erst wenn die Maske bereit ist, starten wir das System
+    refresh();
+    setInterval(refresh, 30000);
+};
+
+spawnMapImg.onerror = () => {
+    console.error("Fehler beim Laden der Spawn-Maske! System läuft im Fallback-Modus.");
+    refresh(); // Starte trotzdem, aber ohne Farbprüfung
+    setInterval(refresh, 30000);
+};
+
+// ── Spawn Logic Validation ────────────────────────────────
+function isValidSpawn(xPerc, yPerc, allowYellow) {
+    if (!spawnCtx) return true; // Fallback, falls Bild nicht geladen werden konnte
+
+    // Prozent in echte Pixelkoordinaten des Bildes umrechnen
+    const x = Math.min(Math.floor((xPerc / 100) * spawnCanvasWidth), spawnCanvasWidth - 1);
+    const y = Math.min(Math.floor((yPerc / 100) * spawnCanvasHeight), spawnCanvasHeight - 1);
+
+    // Pixeldaten an dieser Stelle auslesen (RGBA)
+    const pixel = spawnCtx.getImageData(x, y, 1, 1).data;
+    const r = pixel[0], g = pixel[1], b = pixel[2];
+
+    // Farb-Toleranzen definieren (falls das Bild nicht zu 100% reine Farben hat)
+    const isGreen  = (g > 150 && r < 100);             // Viel Grün, wenig Rot
+    const isYellow = (r > 150 && g > 150 && b < 100);  // Viel Rot & Grün (ergibt Gelb), wenig Blau
+    const isRed    = (r > 150 && g < 100 && b < 100);  // Viel Rot, wenig Grün & Blau
+
+    if (isRed) return false;             // RESTRICTED: Niemals hier spawnen
+    if (isGreen) return true;            // PRIMARY: Perfekter Spawn
+    if (isYellow && allowYellow) return true; // SECONDARY: Nur wenn Grün voll ist
+
+    return false; // Alles andere (schwarz, transparent etc.) wird ignoriert
+}
+
+// ── Clock ─────────────────────────────────────────────────
+function updateClock() {
+    const now = new Date();
+    document.getElementById('clock').textContent = now.toLocaleTimeString('de-DE') + ' // ZULU+1';
+    document.getElementById('last-update').textContent = now.toLocaleTimeString('de-DE');
+}
+setInterval(updateClock, 1000);
+updateClock();
+
+// ── Random selection of online members ───────────────────
+function pickOnlineMembers() {
+    const online = {};
+    for (const [role, data] of Object.entries(ROSTER)) {
+        const shuffled = [...data.members].sort(() => Math.random() - 0.5);
+        const count = Math.max(1, Math.floor(Math.random() * shuffled.length) + 1);
+        online[role] = { ...data, online: shuffled.slice(0, count) };
+    }
+    return online;
+}
+
+// ── Advanced Position Generator (Collision + Mask) ────────
+function genPositions(count) {
+    const positions = [];
+    let currentMinDist = 8; // Mindestabstand (etwas kleiner für grüne Zonen)
+    let attempts = 0;
+    let allowYellow = false;
+    
+    while (positions.length < count && attempts < 5000) {
+        attempts++;
+        
+        // Wenn Grün zu voll ist, erlauben wir sekundäre gelbe Spawns
+        if (attempts > 1500) allowYellow = true; 
+
+        // Map-Grenzen generieren (0% bis 100%)
+        const x = Math.random() * 100;
+        const y = Math.random() * 100;
+
+        // 1. Check: Darf der Operator hier laut Maske spawnen?
+        if (!isValidSpawn(x, y, allowYellow)) {
+            continue; // Nein? Nächster Versuch.
+        }
+
+        // 2. Check: Ist der Abstand zu anderen Operatoren groß genug?
+        let ok = true;
+        for (const p of positions) {
+            const dx = x - p.x, dy = y - p.y;
+            if (Math.sqrt(dx*dx + dy*dy) < currentMinDist) { 
+                ok = false; 
+                break; 
+            }
+        }
+        
+        if (ok) {
+            positions.push({ x, y });
+            attempts = 0; // Reset für den nächsten
+            allowYellow = false; // Wir probieren es erst wieder mit Grün
+        }
+        
+        // Abstand verringern, wenn es eng wird
+        if (attempts > 500) currentMinDist *= 0.9;
+    }
+    return positions;
+}
+
+// ── Render map pings ─────────────────────────────────────
+function renderMap(online) {
+    const map = document.getElementById('map-container');
+    map.querySelectorAll('.map-ping').forEach(el => el.remove());
+
+    let all = [];
+    for (const [role, data] of Object.entries(online)) {
+        for (const name of data.online) {
+            all.push({ name, role, data });
+        }
+    }
+
+    const positions = genPositions(all.length);
+    const driftDurations = [18, 22, 26, 30, 34];
+    const driftDelays    = [0, -5, -10, -15, -20];
+
+    all.forEach((op, i) => {
+        const pos = positions[i];
+        if (!pos) return; // Falls wirklich kein Platz mehr gefunden wurde
+
+        const dur = driftDurations[i % driftDurations.length];
+        const del = driftDelays[i % driftDelays.length];
+
+        const ping = document.createElement('div');
+        ping.className = `map-ping ping-${op.data.cssClass}`;
+        ping.style.left = pos.x + '%';
+        ping.style.top  = pos.y + '%';
+        ping.style.animation = `drift ${dur}s ease-in-out ${del}s infinite`;
+
+        const label = document.createElement('div');
+        label.className = 'ping-label';
+        label.textContent = op.name.length > 12 ? op.name.slice(0,11)+'…' : op.name;
+
+        const roleIcon = document.createElement('div');
+        roleIcon.className = 'ping-role-icon';
+        roleIcon.style.color = op.data.color;
+        roleIcon.textContent = op.data.label.toUpperCase();
+
+        ping.appendChild(label);
+        ping.appendChild(roleIcon);
+        map.appendChild(ping);
+    });
+
+    document.getElementById('op-count').textContent = all.length;
+
+    const cols = ['A','B','C','D','E','F'];
+    const rows = [1,2,3];
+    const sub  = ['ALPHA','BRAVO','CHARLIE','DELTA'];
+    document.getElementById('grid-ref').textContent =
+        cols[Math.floor(Math.random()*cols.length)] +
+        rows[Math.floor(Math.random()*rows.length)] +
+        '-' + sub[Math.floor(Math.random()*sub.length)];
+}
+
+// ── Render roster ─────────────────────────────────────────
+function renderRoster(online) {
+    const container = document.getElementById('roster-container');
+    container.innerHTML = '';
+
+    for (const [role, data] of Object.entries(online)) {
+        if (data.online.length === 0) continue; 
+
+        const block = document.createElement('div');
+        block.className = 'role-block';
+
+        const title = document.createElement('div');
+        title.className = 'roster-role-title';
+        title.style.borderColor = data.color;
+        title.style.color = data.color;
+        title.textContent = `▶ ${data.label.toUpperCase()} — ${data.online.length}/${data.members.length} ONLINE`;
+        block.appendChild(title);
+
+        const list = document.createElement('div');
+        list.className = 'role-members';
+
+        for (const member of data.online) {
+            const row = document.createElement('div');
+            row.className = 'roster-member';
+
+            const dot = document.createElement('div');
+            dot.className = 'dot';
+            dot.style.background = data.color;
+            dot.style.boxShadow  = `0 0 4px ${data.color}`;
+
+            const name = document.createElement('span');
+            name.style.color = data.color;
+            name.textContent = member;
+
+            row.appendChild(dot);
+            row.appendChild(name);
+            list.appendChild(row);
+        }
+
+        block.appendChild(list);
+        container.appendChild(block);
+    }
+}
+
+// ── Init ─────────────────────────────────────────────────
+function refresh() {
+    const online = pickOnlineMembers();
+    renderMap(online);
+    renderRoster(online);
+}
+// Init wird jetzt vom onload-Event des Bildes aufgerufen!
+</script>
+</body>
+</html>
