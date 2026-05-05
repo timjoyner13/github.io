@@ -554,19 +554,20 @@ hinzufügen logic onclick bombe!
         .squad-circle {
             position: absolute;
             border-radius: 50%;
-            border: 2px dashed rgba(0, 255, 65, 0.55);
-            background: rgba(0, 255, 65, 0.04);
-            box-shadow: 0 0 12px rgba(0,255,65,0.15), inset 0 0 12px rgba(0,255,65,0.05);
+            border: 2px dashed var(--sq-color, rgba(0,255,65,0.6));
+            background: var(--sq-bg, rgba(0,255,65,0.04));
+            box-shadow: 0 0 14px var(--sq-glow, rgba(0,255,65,0.18)), inset 0 0 10px var(--sq-glow, rgba(0,255,65,0.06));
             pointer-events: none;
             z-index: 3;
             transform: translate(-50%, -50%);
             animation: squadPulse 3s ease-in-out infinite;
+            transition: border-color 0.3s, box-shadow 0.3s;
         }
         .squad-label {
             position: absolute;
             font-size: 0.42em;
             font-family: 'Courier New', monospace;
-            color: rgba(0,255,65,0.7);
+            color: var(--sq-color, rgba(0,255,65,0.75));
             letter-spacing: 1px;
             text-transform: uppercase;
             pointer-events: none;
@@ -574,8 +575,198 @@ hinzufügen logic onclick bombe!
             white-space: nowrap;
         }
         @keyframes squadPulse {
-            0%, 100% { border-color: rgba(0,255,65,0.55); box-shadow: 0 0 12px rgba(0,255,65,0.15); }
-            50%       { border-color: rgba(0,255,65,0.85); box-shadow: 0 0 20px rgba(0,255,65,0.30); }
+            0%, 100% { border-color: var(--sq-color, rgba(0,255,65,0.55)); box-shadow: 0 0 12px var(--sq-glow,rgba(0,255,65,0.15)); }
+            50%       { border-color: var(--sq-color, rgba(0,255,65,0.9));  box-shadow: 0 0 24px var(--sq-glow,rgba(0,255,65,0.35)); }
+        }
+
+        /* ── CONTACT / UNDER FIRE ── */
+        .squad-circle.contact {
+            animation: contactAlert 0.4s ease-in-out infinite !important;
+            border-style: solid !important;
+            border-width: 3px !important;
+        }
+        @keyframes contactAlert {
+            0%, 100% { border-color: rgba(255,40,40,0.9);  box-shadow: 0 0 28px rgba(255,0,0,0.6),  inset 0 0 20px rgba(255,0,0,0.12); background: rgba(255,0,0,0.06); }
+            50%       { border-color: rgba(255,180,0,0.9);  box-shadow: 0 0 40px rgba(255,140,0,0.5), inset 0 0 25px rgba(255,100,0,0.08); background: rgba(255,80,0,0.04); }
+        }
+        .ping-contact {
+            animation: pingContactFlicker var(--drift-anim, drift-ne) !important;
+        }
+        @keyframes pingFlicker {
+            0%,100% { filter: brightness(1) saturate(1); }
+            20%     { filter: brightness(3) saturate(0) hue-rotate(0deg); opacity: 0.6; }
+            40%     { filter: brightness(1) saturate(1); }
+            65%     { filter: brightness(2.5) saturate(0); opacity: 0.5; }
+            80%     { filter: brightness(1) saturate(1); }
+        }
+        .squad-contact-icon {
+            position: absolute;
+            font-size: 0.55em;
+            z-index: 6;
+            pointer-events: none;
+            animation: contactIconPulse 0.5s ease-in-out infinite;
+            transform: translate(-50%, -50%);
+            text-shadow: 0 0 8px rgba(255,60,0,0.9);
+            white-space: nowrap;
+        }
+        @keyframes contactIconPulse {
+            0%,100% { opacity: 1; transform: translate(-50%,-50%) scale(1.0); }
+            50%     { opacity: 0.4; transform: translate(-50%,-50%) scale(1.3); }
+        }
+
+        /* ── VEHICLES ── */
+        .vehicle {
+            position: absolute;
+            z-index: 5;
+            pointer-events: none;
+            transform: translate(-50%, -50%);
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .vehicle-icon {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            line-height: 1;
+        }
+        .vehicle-icon svg {
+            display: block;
+        }
+        .vehicle-label {
+            margin-top: 2px;
+            font-size: 0.36em;
+            font-family: 'Courier New', monospace;
+            white-space: nowrap;
+            letter-spacing: 0.5px;
+            opacity: 0.85;
+        }
+
+        /* ── SYMBOL EDITOR ── */
+        #symbol-editor-btn {
+            position: fixed;
+            bottom: 18px; right: 18px;
+            z-index: 100;
+            background: rgba(5,10,5,0.92);
+            border: 1px solid rgba(0,255,65,0.45);
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 0.62em;
+            letter-spacing: 1px;
+            padding: 7px 13px;
+            cursor: pointer;
+            text-transform: uppercase;
+            box-shadow: 0 0 12px rgba(0,255,65,0.15);
+            transition: box-shadow 0.2s, border-color 0.2s;
+        }
+        #symbol-editor-btn:hover {
+            border-color: rgba(0,255,65,0.9);
+            box-shadow: 0 0 20px rgba(0,255,65,0.35);
+        }
+        #symbol-editor-overlay {
+            display: none;
+            position: fixed;
+            inset: 0;
+            background: rgba(0,0,0,0.72);
+            z-index: 200;
+            align-items: center;
+            justify-content: center;
+        }
+        #symbol-editor-overlay.open { display: flex; }
+        #symbol-editor-panel {
+            background: rgba(5,10,5,0.97);
+            border: 1px solid rgba(0,255,65,0.5);
+            box-shadow: 0 0 40px rgba(0,255,65,0.15);
+            width: min(720px, 96vw);
+            max-height: 88vh;
+            overflow-y: auto;
+            padding: 22px 26px 26px;
+            font-family: 'Courier New', monospace;
+            color: var(--accent);
+        }
+        #symbol-editor-panel h2 {
+            font-size: 0.85em;
+            letter-spacing: 3px;
+            text-transform: uppercase;
+            border-bottom: 1px solid rgba(0,255,65,0.25);
+            padding-bottom: 10px;
+            margin-bottom: 18px;
+        }
+        .se-row {
+            display: grid;
+            grid-template-columns: 90px 1fr 56px;
+            gap: 10px;
+            align-items: start;
+            margin-bottom: 14px;
+        }
+        .se-preview {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 4px;
+        }
+        .se-preview-box {
+            width: 64px; height: 50px;
+            background: rgba(0,255,65,0.04);
+            border: 1px solid rgba(0,255,65,0.2);
+            display: flex; align-items: center; justify-content: center;
+            border-radius: 3px;
+        }
+        .se-name {
+            font-size: 0.48em;
+            color: rgba(0,255,65,0.6);
+            letter-spacing: 1px;
+            text-transform: uppercase;
+        }
+        .se-textarea {
+            width: 100%;
+            height: 90px;
+            background: rgba(0,0,0,0.6);
+            border: 1px solid rgba(0,255,65,0.25);
+            color: rgba(0,255,65,0.85);
+            font-family: 'Courier New', monospace;
+            font-size: 0.58em;
+            padding: 6px 8px;
+            resize: vertical;
+            outline: none;
+            transition: border-color 0.2s;
+        }
+        .se-textarea:focus { border-color: rgba(0,255,65,0.7); }
+        .se-apply-btn {
+            background: rgba(0,255,65,0.08);
+            border: 1px solid rgba(0,255,65,0.4);
+            color: var(--accent);
+            font-family: 'Courier New', monospace;
+            font-size: 0.58em;
+            letter-spacing: 1px;
+            padding: 6px 8px;
+            cursor: pointer;
+            text-transform: uppercase;
+            width: 100%;
+            transition: background 0.2s, border-color 0.2s;
+            align-self: center;
+        }
+        .se-apply-btn:hover { background: rgba(0,255,65,0.18); border-color: rgba(0,255,65,0.8); }
+        .se-close-btn {
+            display: block;
+            margin: 18px auto 0;
+            background: transparent;
+            border: 1px solid rgba(0,255,65,0.3);
+            color: rgba(0,255,65,0.6);
+            font-family: 'Courier New', monospace;
+            font-size: 0.6em;
+            letter-spacing: 2px;
+            padding: 7px 22px;
+            cursor: pointer;
+            text-transform: uppercase;
+            transition: border-color 0.2s, color 0.2s;
+        }
+        .se-close-btn:hover { border-color: rgba(0,255,65,0.8); color: var(--accent); }
+        .se-hint {
+            font-size: 0.48em;
+            color: rgba(0,255,65,0.4);
+            margin-bottom: 16px;
+            line-height: 1.6;
         }
     </style>
 </head>
@@ -903,11 +1094,12 @@ function mortarStrike(ping, x, y) {
     ping.style.setProperty('--fly-y', flyY + 'px');
     ping.style.animation = 'pingFlyOff 0.55s ease-in forwards';
 
-    // Einschlag-FX + Kill-Feed
+    // Einschlag-FX + Kill-Feed + Squad-Kontakt prüfen
     spawnMortarEffect(x, y);
     addKillFeedEntry(opName, rankColor, rankLabel);
+    checkSquadContact(x, y);
 
-    // Nach 5 Sekunden respawnen
+    // Nach 30 Sekunden respawnen
     setTimeout(() => {
         if (!ping.isConnected) return;
         ping.dataset.struck = '0';
@@ -927,7 +1119,7 @@ function mortarStrike(ping, x, y) {
         ping.style.animation = `${animName} ${dur}s ease-in-out infinite`;
         ping.style.transition = 'opacity 0.7s ease';
         ping.style.opacity = '1';
-    }, 5000);
+    }, 30000);
 }
 
 function renderMap(online) {
@@ -1040,18 +1232,99 @@ function renderRoster(online) {
 }
 
 
-// ── Squad Grouping Detection ──────────────────────────────
-// "2 Quadranten" ≈ ~14% Distanz auf der Map (jeder Quadrant = 1/9 ≈ 11%)
-const SQUAD_THRESHOLD = 14; // Prozent-Distanz für Squad-Erkennung
+// ── Squad System ──────────────────────────────────────────
+const SQUAD_THRESHOLD = 14;
+
+// 6 distinkte Squad-Farben (RGB für CSS-Variablen)
+const SQUAD_COLORS = [
+    { color:'rgba(0,255,100,0.75)',   bg:'rgba(0,255,100,0.05)',  glow:'rgba(0,255,100,0.2)',   hex:'#00ff64' },
+    { color:'rgba(100,180,255,0.75)', bg:'rgba(80,160,255,0.05)', glow:'rgba(80,160,255,0.2)',  hex:'#64b4ff' },
+    { color:'rgba(255,200,0,0.8)',    bg:'rgba(255,200,0,0.04)',  glow:'rgba(255,200,0,0.2)',   hex:'#ffc800' },
+    { color:'rgba(255,100,220,0.75)', bg:'rgba(255,80,220,0.04)', glow:'rgba(255,80,220,0.2)',  hex:'#ff64dc' },
+    { color:'rgba(255,140,0,0.8)',    bg:'rgba(255,130,0,0.05)',  glow:'rgba(255,130,0,0.2)',   hex:'#ff8c00' },
+    { color:'rgba(160,255,80,0.75)',  bg:'rgba(160,255,60,0.04)', glow:'rgba(160,255,60,0.2)',  hex:'#a0ff50' },
+];
+const SQUAD_NAMES = ['ALPHA','BRAVO','CHARLIE','DELTA','ECHO','FOXTROT'];
+
+// Contact-State: welcher Squad ist gerade unter Beschuss
+const contactSquads = new Set(); // speichert Squad-Namen
+
+const CONTACT_REPORTS = [
+    '⚠️  Kontakt! Feindkontakt bestätigt',
+    '🔴 FEUER! Squad unter Beschuss',
+    '📡 Feuerkontakt — Angreifer aus {dir}',
+    '🚨 CONTACT! Feuerkontakt gemeldet',
+    '⚡ Ambush! Squad angegriffen',
+    '🔥 Direkte Feuerberührung — {dir}',
+];
+const DIRS = ['Nord','Süd','Ost','West','Nord-Ost','Nord-West','Süd-Ost','Süd-West'];
+
+function triggerContactEvent(squadName, cx, cy, circleEl, memberPings, squadColor) {
+    if (contactSquads.has(squadName)) return;
+    contactSquads.add(squadName);
+
+    // Kreis rot blinken
+    circleEl.classList.add('contact');
+
+    // Dots flackern
+    memberPings.forEach(p => {
+        if (p && p.isConnected) {
+            p.style.animation += ', pingFlicker 0.35s ease-in-out infinite';
+        }
+    });
+
+    // Kontakt-Icon auf dem Kreis
+    const map = document.getElementById('map-container');
+    const icon = document.createElement('div');
+    icon.className = 'squad-contact-icon';
+    icon.style.left = cx + '%';
+    icon.style.top  = cy + '%';
+    icon.textContent = '⚠ CONTACT ⚠';
+    icon.style.color = '#ff3030';
+    map.appendChild(icon);
+
+    // Kill-Feed Eintrag
+    const tmpl = CONTACT_REPORTS[Math.floor(Math.random()*CONTACT_REPORTS.length)];
+    const dir   = DIRS[Math.floor(Math.random()*DIRS.length)];
+    const msg   = tmpl.replace('{dir}', dir);
+    const now   = new Date().toLocaleTimeString('de-DE');
+    const feed  = document.getElementById('kill-feed');
+    if (feed) {
+        const entry = document.createElement('div');
+        entry.className = 'kill-entry';
+        entry.style.borderLeftColor = '#ff8800';
+        entry.innerHTML = `
+            <div class="kill-time">[ ${now} // CONTACT REPORT ]</div>
+            <div class="kill-name" style="color:${squadColor.hex}">▸ SQUAD ${squadName}</div>
+            <div class="kill-cause">${msg}</div>`;
+        feed.insertBefore(entry, feed.firstChild);
+        setTimeout(() => entry.remove(), 5100);
+        while (feed.children.length > 5) feed.removeChild(feed.lastChild);
+    }
+
+    // Nach 6–10 Sek. Contact beenden
+    const dur = 6000 + Math.random() * 4000;
+    setTimeout(() => {
+        contactSquads.delete(squadName);
+        circleEl.classList.remove('contact');
+        if (icon.isConnected) icon.remove();
+        memberPings.forEach(p => {
+            if (p && p.isConnected) {
+                // Drift-Animation wiederherstellen
+                const a = p.style.animation;
+                p.style.animation = a.replace(/, pingFlicker[^,]*/g, '');
+            }
+        });
+    }, dur);
+}
 
 function renderSquads(positions, all) {
     const map = document.getElementById('map-container');
-    // Alte Squad-Elemente entfernen
-    map.querySelectorAll('.squad-circle, .squad-label').forEach(el => el.remove());
+    map.querySelectorAll('.squad-circle, .squad-label, .squad-contact-icon').forEach(el => el.remove());
+    contactSquads.clear();
 
     if (!positions || positions.length < 2) return;
 
-    // Union-Find für Gruppenbildung
     const parent = positions.map((_, i) => i);
     function find(i) { return parent[i] === i ? i : (parent[i] = find(parent[i])); }
     function union(a, b) { parent[find(a)] = find(b); }
@@ -1065,63 +1338,314 @@ function renderSquads(positions, all) {
         }
     }
 
-    // Gruppen sammeln
     const groups = {};
     positions.forEach((pos, i) => {
         if (!pos) return;
         const root = find(i);
         if (!groups[root]) groups[root] = [];
-        groups[root].push({ pos, op: all[i] });
+        groups[root].push({ pos, op: all[i], idx: i });
     });
 
-    const SQUAD_NAMES = ['ALPHA','BRAVO','CHARLIE','DELTA','ECHO','FOXTROT'];
     let squadIdx = 0;
+    const squadTimers = [];
 
     for (const members of Object.values(groups)) {
-        if (members.length < 2) continue; // Nur echte Gruppen
+        if (members.length < 2) continue;
 
-        // Bounding-Kreis berechnen
+        const sc = SQUAD_COLORS[squadIdx % SQUAD_COLORS.length];
+        const sName = SQUAD_NAMES[squadIdx % SQUAD_NAMES.length];
+
         const xs = members.map(m => m.pos.x);
         const ys = members.map(m => m.pos.y);
         const cx = (Math.min(...xs) + Math.max(...xs)) / 2;
         const cy = (Math.min(...ys) + Math.max(...ys)) / 2;
 
-        // Radius = Abstand zum entferntesten Mitglied + Puffer
         let maxDist = 0;
         for (const { pos } of members) {
             const d = Math.sqrt((pos.x-cx)**2 + (pos.y-cy)**2);
             if (d > maxDist) maxDist = d;
         }
-        // Radius in Pixel umrechnen (Map ist ~100% breit, 520px hoch)
-        const mapEl = document.getElementById('map-container');
-        const mapW = mapEl.offsetWidth;
-        const mapH = mapEl.offsetHeight;
 
-        const rPxW = (maxDist / 100) * mapW + 22; // +Puffer px
-        const rPxH = (maxDist / 100) * mapH + 22;
-        const rPx = Math.max(rPxW, rPxH, 28);
+        const mapEl = map;
+        const mapW  = mapEl.offsetWidth;
+        const mapH  = mapEl.offsetHeight;
+        const rPxW  = (maxDist / 100) * mapW + 24;
+        const rPxH  = (maxDist / 100) * mapH + 24;
+        const rPx   = Math.max(rPxW, rPxH, 32);
 
         const circle = document.createElement('div');
         circle.className = 'squad-circle';
+        circle.style.setProperty('--sq-color', sc.color);
+        circle.style.setProperty('--sq-bg',    sc.bg);
+        circle.style.setProperty('--sq-glow',  sc.glow);
         circle.style.left   = cx + '%';
         circle.style.top    = cy + '%';
         circle.style.width  = (rPx * 2) + 'px';
         circle.style.height = (rPx * 2) + 'px';
         map.appendChild(circle);
 
-        // Label oben am Kreis
         const label = document.createElement('div');
         label.className = 'squad-label';
-        const labelX = cx;
-        const labelY = cy - (rPx / mapH * 100) - 1.5;
-        label.style.left = labelX + '%';
+        label.style.setProperty('--sq-color', sc.color);
+        const labelY = cy - (rPx / mapH * 100) - 1.8;
+        label.style.left = cx + '%';
         label.style.top  = labelY + '%';
         label.style.transform = 'translateX(-50%)';
-        label.textContent = `▸ SQUAD ${SQUAD_NAMES[squadIdx % SQUAD_NAMES.length]} [${members.length}]`;
+        label.style.color = sc.hex;
+        label.textContent = `▸ SQUAD ${sName} [${members.length}]`;
         map.appendChild(label);
+
+        // Ping-Elemente dieser Squad-Mitglieder sammeln
+        const memberPings = members.map(m => {
+            const pings = map.querySelectorAll('.map-ping');
+            return pings[m.idx] || null;
+        });
+
+        // Zufällig Contact-Event auslösen (20% Chance, frühestens nach 4s)
+        const capturedCircle = circle;
+        const capturedColor  = sc;
+        const capturedName   = sName;
+        if (Math.random() < 0.20) {
+            const delay = 4000 + Math.random() * 12000;
+            const t = setTimeout(() => {
+                if (capturedCircle.isConnected) {
+                    triggerContactEvent(capturedName, cx, cy, capturedCircle, memberPings, capturedColor);
+                }
+            }, delay);
+            squadTimers.push(t);
+        }
 
         squadIdx++;
     }
+}
+
+
+// ── Vehicle System ──────────────────────────────────────────
+// Alle Icons: 2D-Draufsicht (top-down), Fahrtrichtung = rechts (0°)
+const SVG_ICONS = {
+
+    // Panzer: Draufsicht — breite Kette links+rechts, Turm mittig, langer Lauf nach rechts
+    tank: `<svg viewBox="0 0 28 20" width="28" height="20" xmlns="http://www.w3.org/2000/svg">
+      <!-- linke Kette -->
+      <rect x="0" y="2"  width="28" height="4" rx="1.5" fill="#2a3a18"/>
+      <!-- rechte Kette -->
+      <rect x="0" y="14" width="28" height="4" rx="1.5" fill="#2a3a18"/>
+      <!-- Rumpf -->
+      <rect x="3" y="5"  width="22" height="10" rx="1.5" fill="#4a6030"/>
+      <!-- Turm -->
+      <ellipse cx="13" cy="10" rx="5" ry="4.5" fill="#567040"/>
+      <!-- Kanonenrohr (zeigt rechts) -->
+      <rect x="14" y="9" width="12" height="2" rx="1" fill="#3a4f28"/>
+    </svg>`,
+
+    // APC: Draufsicht — breiter gepanzerter Kasten, leicht abgerundet
+    apc: `<svg viewBox="0 0 26 18" width="26" height="18" xmlns="http://www.w3.org/2000/svg">
+      <!-- Ketten -->
+      <rect x="0" y="1"  width="26" height="3" rx="1" fill="#2a3a18"/>
+      <rect x="0" y="14" width="26" height="3" rx="1" fill="#2a3a18"/>
+      <!-- Rumpf -->
+      <rect x="2" y="4"  width="22" height="10" rx="2" fill="#4a6030"/>
+      <!-- Dachdetail -->
+      <rect x="5" y="6"  width="12" height="6" rx="1" fill="#567040"/>
+      <!-- MG-Turm klein -->
+      <circle cx="11" cy="9" r="2.5" fill="#3a4f28"/>
+      <rect x="12" y="8.5" width="7" height="1" rx="0.5" fill="#2a3018"/>
+    </svg>`,
+
+    // Jeep: Draufsicht — kleineres Fahrzeug, 4 Räder sichtbar
+    jeep: `<svg viewBox="0 0 22 14" width="22" height="14" xmlns="http://www.w3.org/2000/svg">
+      <!-- Räder (4 Ecken) -->
+      <rect x="1"  y="1"  width="5" height="3" rx="1" fill="#1a2010"/>
+      <rect x="16" y="1"  width="5" height="3" rx="1" fill="#1a2010"/>
+      <rect x="1"  y="10" width="5" height="3" rx="1" fill="#1a2010"/>
+      <rect x="16" y="10" width="5" height="3" rx="1" fill="#1a2010"/>
+      <!-- Karosserie -->
+      <rect x="4" y="2" width="14" height="10" rx="2" fill="#556b2f"/>
+      <!-- Windschutzscheibe -->
+      <rect x="14" y="3" width="3"  height="3" rx="0.5" fill="#88aa55" opacity="0.6"/>
+    </svg>`,
+
+    // Helikopter: Draufsicht — ovaler Rumpf, zwei lange Rotorblätter kreuzförmig
+    heli: `<svg viewBox="0 0 36 28" width="36" height="28" xmlns="http://www.w3.org/2000/svg">
+      <!-- Heckausleger -->
+      <rect x="0" y="13" width="10" height="2" rx="1" fill="#2a4a60"/>
+      <!-- Rumpf -->
+      <ellipse cx="22" cy="14" rx="10" ry="6" fill="#3a5a70"/>
+      <!-- Heckrotor -->
+      <rect x="1"  y="10" width="2" height="8" rx="1" fill="#1a3040"/>
+      <!-- Hauptrotorblätter (Kreuz) -->
+      <rect x="5"  y="13" width="32" height="2" rx="1" fill="#1a3040" opacity="0.85"/>
+      <rect x="20" y="2"  width="2"  height="24" rx="1" fill="#1a3040" opacity="0.85"/>
+      <!-- Rotornabe -->
+      <circle cx="21" cy="14" r="2.5" fill="#0a1a28"/>
+    </svg>`,
+
+    // Jet: Draufsicht — schlanker Rumpf, Deltaflügel links+rechts, Nase rechts
+    jet: `<svg viewBox="0 0 38 22" width="38" height="22" xmlns="http://www.w3.org/2000/svg">
+      <!-- Deltaflügel links oben -->
+      <polygon points="28,11 6,3  10,11" fill="#405060"/>
+      <!-- Deltaflügel rechts unten -->
+      <polygon points="28,11 6,19 10,11" fill="#405060"/>
+      <!-- Rumpf (Nase zeigt rechts) -->
+      <ellipse cx="18" cy="11" rx="14" ry="3.5" fill="#506070"/>
+      <!-- Nase -->
+      <polygon points="32,11 36,11 32,12" fill="#607080"/>
+      <!-- Cockpit -->
+      <ellipse cx="26" cy="11" rx="3" ry="2" fill="#88bbcc" opacity="0.7"/>
+      <!-- Heck-Nachbrenner -->
+      <rect x="3" y="10" width="3" height="2" rx="1" fill="#ff6600" opacity="0.9"/>
+    </svg>`,
+};
+
+const VEHICLE_DEFS = [
+    { type:'tank', label:'PANZER-01', speed:0.12, color:'rgba(100,220,100,0.9)', glow:'rgba(100,255,100,0.5)' },
+    { type:'tank', label:'PANZER-02', speed:0.10, color:'rgba(100,220,100,0.9)', glow:'rgba(100,255,100,0.5)' },
+    { type:'apc',  label:'APC-01',   speed:0.18, color:'rgba(0,200,255,0.9)',   glow:'rgba(0,200,255,0.5)'   },
+    { type:'apc',  label:'APC-02',   speed:0.15, color:'rgba(0,200,255,0.9)',   glow:'rgba(0,200,255,0.5)'   },
+    { type:'jeep', label:'RECON-01', speed:0.28, color:'rgba(255,204,0,0.9)',   glow:'rgba(255,180,0,0.5)'   },
+    { type:'jeep', label:'RECON-02', speed:0.24, color:'rgba(255,204,0,0.9)',   glow:'rgba(255,180,0,0.5)'   },
+    { type:'heli', label:'HELI-01',  speed:0.32, color:'rgba(255,120,80,0.9)',  glow:'rgba(255,100,60,0.5)', aerial:true },
+    { type:'jet',  label:'JET-01',   speed:0.55, color:'rgba(200,160,255,0.9)', glow:'rgba(180,120,255,0.5)', aerial:true },
+];
+
+let vehicleElements = [];
+let vehicleStates   = [];  // { x, y, angle, segT, segIdx, route, speed, aerial, waitMs }
+let vehicleAnimFrame = null;
+
+// Baut eine glatte Route aus benachbarten grünen Punkten
+function buildRoute(steps, aerial) {
+    if (aerial) {
+        const pts = [];
+        for (let i = 0; i < steps; i++)
+            pts.push({ x: 12 + Math.random()*76, y: 8 + Math.random()*84 });
+        return pts;
+    }
+    if (greenCandidates.length < 4) return null;
+    // Starte an einem zufälligen Punkt
+    const startIdx = Math.floor(Math.random() * greenCandidates.length);
+    const route    = [greenCandidates[startIdx]];
+    const used     = new Set([startIdx]);
+
+    while (route.length < steps) {
+        const last = route[route.length - 1];
+        // Sammle alle Nachbarn im Umkreis 3–12%
+        const neighbours = [];
+        for (let i = 0; i < greenCandidates.length; i++) {
+            if (used.has(i)) continue;
+            const dx = greenCandidates[i].x - last.x;
+            const dy = greenCandidates[i].y - last.y;
+            const d  = Math.sqrt(dx*dx + dy*dy);
+            if (d >= 2 && d <= 12) neighbours.push({ i, d });
+        }
+        if (neighbours.length === 0) break;
+        // Wähle einen zufälligen nahen Nachbarn (nicht immer den nächsten → natürlicher)
+        neighbours.sort((a,b) => a.d - b.d);
+        const pick = neighbours[Math.floor(Math.random() * Math.min(3, neighbours.length))];
+        used.add(pick.i);
+        route.push(greenCandidates[pick.i]);
+    }
+    return route.length >= 2 ? route : null;
+}
+
+function initVehicles() {
+    if (greenCandidates.length < 10) { setTimeout(initVehicles, 400); return; }
+
+    vehicleElements.forEach(el => el?.remove());
+    vehicleElements = [];
+    vehicleStates   = [];
+    if (vehicleAnimFrame) { cancelAnimationFrame(vehicleAnimFrame); vehicleAnimFrame = null; }
+
+    const map = document.getElementById('map-container');
+
+    VEHICLE_DEFS.forEach(def => {
+        const route = buildRoute(def.aerial ? 8 : 16, def.aerial);
+        if (!route) return;
+
+        const wrapper = document.createElement('div');
+        wrapper.className = 'vehicle';
+
+        const iconWrap = document.createElement('div');
+        iconWrap.className = 'vehicle-icon';
+        iconWrap.innerHTML = SVG_ICONS[def.type] || SVG_ICONS.jeep;
+        iconWrap.style.filter = `drop-shadow(0 0 4px ${def.glow})`;
+
+        const lbl = document.createElement('div');
+        lbl.className = 'vehicle-label';
+        lbl.style.color = def.color;
+        lbl.textContent = def.label;
+
+        wrapper.appendChild(iconWrap);
+        wrapper.appendChild(lbl);
+        map.appendChild(wrapper);
+        vehicleElements.push(wrapper);
+
+        // Startwinkel zum nächsten Waypoint
+        const dx0 = route[1].x - route[0].x;
+        const dy0 = route[1].y - route[0].y;
+        vehicleStates.push({
+            x: route[0].x, y: route[0].y,
+            angle: Math.atan2(dy0, dx0) * 180 / Math.PI,
+            segT: 0, segIdx: 0,
+            route, speed: def.speed,
+            aerial: !!def.aerial,
+            waitMs: 0,
+        });
+    });
+
+    let lastTs = 0;
+    function tick(ts) {
+        const dt = Math.min(ts - lastTs, 60); // max 60ms cap
+        lastTs = ts;
+
+        vehicleStates.forEach((vs, i) => {
+            const el = vehicleElements[i];
+            if (!el?.isConnected) return;
+
+            // Wartepause
+            if (vs.waitMs > 0) { vs.waitMs -= dt; return; }
+
+            const route = vs.route;
+            const n     = route.length;
+            const cur   = route[vs.segIdx];
+            const next  = route[(vs.segIdx + 1) % n];
+
+            // Segmentlänge in %-Einheiten
+            const dxSeg = next.x - cur.x;
+            const dySeg = next.y - cur.y;
+            const segLen = Math.sqrt(dxSeg*dxSeg + dySeg*dySeg) || 0.001;
+
+            // Fortschritt: speed in %/s, dt in ms
+            vs.segT += (vs.speed * dt) / (segLen * 1000);
+
+            // Nächstes Segment?
+            if (vs.segT >= 1) {
+                vs.segT   = 0;
+                vs.segIdx = (vs.segIdx + 1) % n;
+                if (!vs.aerial) vs.waitMs = 150 + Math.random() * 500;
+                return; // Position erst nächsten Frame updaten (kein Sprung)
+            }
+
+            // Lineare Interpolation — KEIN Ease (verhindert Rückwärtsbewegung)
+            vs.x = cur.x + dxSeg * vs.segT;
+            vs.y = cur.y + dySeg * vs.segT;
+
+            // Winkel smooth interpolieren (verhindert Sprünge)
+            const targetAngle = Math.atan2(dySeg, dxSeg) * 180 / Math.PI;
+            let delta = targetAngle - vs.angle;
+            // Kürzester Weg um den Kreis
+            if (delta >  180) delta -= 360;
+            if (delta < -180) delta += 360;
+            vs.angle += delta * Math.min(dt * 0.008, 1); // sanftes Nachdrehen
+
+            el.style.left      = vs.x + '%';
+            el.style.top       = vs.y + '%';
+            el.style.transform = `translate(-50%,-50%) rotate(${vs.angle}deg)`;
+        });
+
+        vehicleAnimFrame = requestAnimationFrame(tick);
+    }
+
+    vehicleAnimFrame = requestAnimationFrame(tick);
 }
 
 // ── Init ─────────────────────────────────────────────────
@@ -1129,8 +1653,113 @@ function refresh() {
     const online = pickOnlineMembers();
     renderMap(online);
     renderRoster(online);
+    // Fahrzeuge nur beim ersten Mal initialisieren (laufen dann dauerhaft)
+    if (vehicleElements.length === 0) {
+        setTimeout(initVehicles, 600); // kurz warten bis Kandidaten-Pools bereit
+    }
 }
 // Init wird jetzt vom onload-Event des Bildes aufgerufen!
+
+// ── Symbol Editor Logic ───────────────────────────────────
+function openSymbolEditor() {
+    const overlay = document.getElementById('symbol-editor-overlay');
+    const rowsEl  = document.getElementById('se-rows');
+    rowsEl.innerHTML = '';
+
+    // Fahrzeug-Typen die editierbar sind
+    const types = Object.keys(SVG_ICONS);
+    types.forEach(type => {
+        const row = document.createElement('div');
+        row.className = 'se-row';
+
+        // Vorschau
+        const preview = document.createElement('div');
+        preview.className = 'se-preview';
+        const box = document.createElement('div');
+        box.className = 'se-preview-box';
+        box.id = `se-preview-${type}`;
+        box.innerHTML = SVG_ICONS[type];
+        const name = document.createElement('div');
+        name.className = 'se-name';
+        name.textContent = type;
+        preview.appendChild(box);
+        preview.appendChild(name);
+
+        // Textarea mit aktuellem SVG
+        const ta = document.createElement('textarea');
+        ta.className = 'se-textarea';
+        ta.id = `se-ta-${type}`;
+        ta.value = SVG_ICONS[type].trim();
+        // Live-Vorschau beim Tippen
+        ta.addEventListener('input', () => {
+            const val = ta.value.trim();
+            if (val.startsWith('<svg')) {
+                document.getElementById(`se-preview-${type}`).innerHTML = val;
+            }
+        });
+
+        // Apply-Button
+        const btn = document.createElement('button');
+        btn.className = 'se-apply-btn';
+        btn.textContent = '▸ Apply';
+        btn.onclick = () => applySymbol(type, ta.value.trim());
+
+        row.appendChild(preview);
+        row.appendChild(ta);
+        row.appendChild(btn);
+        rowsEl.appendChild(row);
+    });
+
+    overlay.classList.add('open');
+}
+
+function closeSymbolEditor() {
+    document.getElementById('symbol-editor-overlay').classList.remove('open');
+}
+
+function applySymbol(type, svgCode) {
+    if (!svgCode.startsWith('<svg')) {
+        alert('Ungültiger SVG-Code. Muss mit <svg beginnen.');
+        return;
+    }
+    // Symbol global ersetzen
+    SVG_ICONS[type] = svgCode;
+
+    // Vorschau updaten
+    const box = document.getElementById(`se-preview-${type}`);
+    if (box) box.innerHTML = svgCode;
+
+    // Alle Fahrzeuge dieses Typs auf der Karte live updaten
+    VEHICLE_DEFS.forEach((def, i) => {
+        if (def.type !== type) return;
+        const el = vehicleElements[i];
+        if (!el) return;
+        const iconWrap = el.querySelector('.vehicle-icon');
+        if (iconWrap) iconWrap.innerHTML = svgCode;
+    });
+}
+
+// Klick außerhalb schließt den Editor
+document.getElementById('symbol-editor-overlay').addEventListener('click', function(e) {
+    if (e.target === this) closeSymbolEditor();
+});
+
 </script>
+
+<!-- ── Symbol Editor ── -->
+<button id="symbol-editor-btn" onclick="openSymbolEditor()">⚙ Symbole bearbeiten</button>
+
+<div id="symbol-editor-overlay">
+  <div id="symbol-editor-panel">
+    <h2>▶ Symbol Editor // Fahrzeuge</h2>
+    <p class="se-hint">
+      SVG-Code direkt bearbeiten. Fahrtrichtung = rechts (0°). Jedes SVG sollte ein viewBox-Attribut haben.<br>
+      Änderungen werden sofort auf der Karte übernommen — Fahrzeuge werden neu gestartet.
+    </p>
+    <div id="se-rows"></div>
+    <button class="se-close-btn" onclick="closeSymbolEditor()">[ Schließen ]</button>
+  </div>
+</div>
+
 </body>
 </html>
