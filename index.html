@@ -2,216 +2,312 @@
 <html lang="de">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Tactical Command Hub</title>
+    <title>HUB // Pepe Battalion Command</title>
     <style>
-        :root { 
-            --accent: #00ff41; 
-            --army: #4b5320; 
-            --glow: rgba(0, 255, 65, 0.4);
+        :root {
+            --accent: #00ff41; /* */
+            --army: #4b5320; /* */
+            --alert: #ff4141; /* */
+            --bg: #050a05; /*[cite: 4] */
         }
 
-        body { 
-            font-family: 'Courier New', monospace; 
-            background-color: #ffffff;
-            background-image: url('DEIN_HINTERGRUND.gif'); 
-            background-size: cover; 
-            background-attachment: fixed; 
-            background-position: center;
-            color: var(--accent); 
-            margin: 0; 
-            height: 100vh; 
-            display: flex; 
-            flex-direction: column; 
-            align-items: center; 
-            justify-content: center;
-            overflow: hidden;
+        * { box-sizing: border-box; margin: 0; padding: 0; }
 
-            padding-bottom: 40px;
-        }
-
-        /* Scanlines & Abdunklung */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.85);
-            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.1) 50%);
-            background-size: 100% 4px; z-index: 1; pointer-events: none;
-        }
-
-        .top-nav {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(10, 15, 10, 0.95); border-bottom: 1px solid var(--army);
-            z-index: 9999; display: flex; justify-content: center; gap: 10px; padding: 12px 0;
-        }
-        .top-nav a {
-            color: var(--accent); text-decoration: none; font-size: 0.75em;
-            font-weight: bold; padding: 6px 12px; text-transform: uppercase; border: 1px solid transparent;
-        }
-        .top-nav a:hover { border: 1px solid var(--accent); background: rgba(0, 255, 65, 0.1); }
-
-        .container {
-            position: relative; z-index: 10; text-align: center;
-            padding: 40px; border: 2px solid var(--army);
-            background: rgba(10, 15, 10, 0.9);
-            box-shadow: 0 0 30px rgba(0,0,0,1);
-            max-width: 650px; width: 90%;
-        }
-
-        h1 {
-            font-size: 2.2em; letter-spacing: 5px; margin-bottom: 5px;
-            text-shadow: 0 0 10px var(--accent);
-        }
-
-        /* Motto Styling */
-        .motto {
-            font-size: 0.9em;
-            letter-spacing: 3px;
+        body {
+            font-family: 'Courier New', monospace; /*[cite: 4] */
+            background-color: var(--bg);
+            background-image: 
+                linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+            background-size: 30px 30px;
             color: var(--accent);
-            text-transform: uppercase;
-            margin-bottom: 25px;
-            opacity: 0.8;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            overflow: hidden;
+        }
+
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: repeating-linear-gradient(0deg, transparent, transparent 2px, rgba(0,0,0,0.1) 2px, rgba(0,0,0,0.1) 4px);
+            pointer-events: none;
+            z-index: 1000;
+        }
+
+        .hub-container {
+            width: 90%;
+            max-width: 1200px;
+            position: relative;
+            z-index: 10;
+        }
+
+        .hub-header {
             border-bottom: 2px solid var(--army);
+            margin-bottom: 20px;
             padding-bottom: 15px;
-            display: block;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
         }
 
-        .main-menu {
-            display: grid; grid-template-columns: 1fr 1fr; gap: 15px;
+        .hub-header h1 {
+            font-size: 2.5em;
+            letter-spacing: 5px;
+            text-shadow: 0 0 15px var(--accent);
         }
 
-        .nav-link {
-            text-decoration: none; color: var(--accent);
-            padding: 18px; border: 1px solid var(--army);
-            font-weight: bold; text-transform: uppercase;
-            transition: all 0.3s ease;
+        .status-box {
+            text-align: right;
+            font-size: 0.8em;
+            color: var(--army);
+        }
+
+        /* Comm Center & Ticker Style */
+        .comm-center {
+            margin-bottom: 30px;
+            border: 1px solid var(--army);
+            padding: 15px;
+            background: rgba(10, 20, 10, 0.5);
+        }
+
+        .comm-center h3 {
+            font-size: 0.7em;
+            color: var(--alert);
+            margin-bottom: 10px;
+            text-transform: uppercase;
+        }
+
+        .typewriter {
             font-size: 0.9em;
-            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            white-space: nowrap;
+            overflow: hidden;
+            border-right: 2px solid var(--accent);
+            animation: typing 3.5s steps(40, end), blink-caret .75s step-end infinite;
+            margin-bottom: 15px;
         }
 
-        .nav-link small { font-size: 0.6em; color: var(--army); margin-top: 5px; }
-
-        .nav-link:hover {
-            background: var(--army); color: #fff;
-            box-shadow: 0 0 15px var(--glow);
-            transform: scale(1.03); border-color: var(--accent);
+        /* Pseudo Feed Ticker */
+        .intel-ticker {
+            border-top: 1px dashed var(--army);
+            padding-top: 10px;
+            overflow: hidden;
+            white-space: nowrap;
+            display: flex;
         }
 
-        .status-bar { margin-top: 25px; font-size: 0.75em; color: var(--army); letter-spacing: 2px; }
-        .blink { animation: blinker 1.5s linear infinite; color: var(--accent); }
-        @keyframes blinker { 50% { opacity: 0; } }
+        .ticker-content {
+            display: inline-block;
+            padding-left: 100%;
+            animation: ticker-move 30s linear infinite;
+            font-size: 0.75em;
+            color: var(--army);
+            text-transform: uppercase;
+        }
 
-        /* --- TACTICAL NEWS FLASH FOOTER --- */
-.news-flash-footer {
-    position: fixed;
-    bottom: 0;
-    left: 0;
-    width: 100%;
-    height: 30px;
-    background: rgba(0, 0, 0, 0.9);
-    border-top: 2px solid var(--army);
-    display: flex;
-    align-items: center;
-    z-index: 2000;
-    overflow: hidden;
-    font-size: 0.85em;
-    font-weight: bold;
-    letter-spacing: 1px;
-}
+        .ticker-item {
+            display: inline-block;
+            padding-right: 40px;
+        }
 
-/* Der statische rote/grüne "Status"-Block vorne */
-.news-title {
-    background: var(--army);
-    color: #fff;
-    padding: 0 15px;
-    height: 100%;
-    display: flex;
-    align-items: center;
-    white-space: nowrap;
-    z-index: 2001;
-    border-right: 2px solid var(--accent);
-    text-transform: uppercase;
-}
+        .ticker-item::before {
+            content: "[LOG]";
+            color: var(--accent);
+            margin-right: 10px;
+        }
 
-/* Container für die Laufschrift */
-.ticker-wrapper {
-    flex-grow: 1;
-    overflow: hidden;
-    display: flex;
-    align-items: center;
-}
+        @keyframes typing { from { width: 0 } to { width: 100% } }
+        @keyframes blink-caret { from, to { border-color: transparent } 50% { border-color: var(--accent); } }
+        @keyframes ticker-move {
+            0% { transform: translate3d(0, 0, 0); }
+            100% { transform: translate3d(-100%, 0, 0); }
+        }
 
-.ticker-text {
-    display: inline-block;
-    white-space: nowrap;
-    padding-left: 100%; /* Startet außerhalb des Sichtfelds */
-    animation: ticker 30s linear infinite;
-    color: var(--accent);
-    text-transform: uppercase;
-}
+        /* Grid */
+        .menu-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(250px, 1fr));
+            gap: 20px;
+        }
 
-.ticker-item {
-    display: inline-block;
-    padding-right: 50px;
-}
+        .menu-card {
+            background: rgba(10, 20, 10, 0.8);
+            border: 1px solid var(--army);
+            padding: 25px;
+            text-decoration: none;
+            color: var(--accent);
+            position: relative;
+            transition: all 0.3s ease;
+            height: 180px;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-between;
+        }
 
-.ticker-item::before {
-    content: " [ +++ ] ";
-    color: var(--army);
-    margin-right: 10px;
-}
+        .menu-card:hover {
+            border-color: var(--accent);
+            background: rgba(0, 255, 65, 0.05);
+            box-shadow: 0 0 20px rgba(0, 255, 65, 0.2);
+            transform: translateY(-5px);
+        }
 
-/* Die Animation */
-@keyframes ticker {
-    0% { transform: translate3d(0, 0, 0); }
-    100% { transform: translate3d(-100%, 0, 0); }
-}
-
+        .menu-card h2 { font-size: 1.1em; letter-spacing: 2px; text-transform: uppercase; }
+        .menu-card p { font-size: 0.7em; color: var(--army); line-height: 1.4; }
+        .card-id { font-size: 0.6em; opacity: 0.5; text-align: right; }
 
     </style>
 </head>
 <body>
 
-    <div class="overlay"></div>
-
-    <nav class="top-nav">
-        <a href="" style="background: rgba(0,255,65,0.1); border-color: var(--accent);">[ HUB ]</a>
-        <a href="htmls/community.html">[ PEPE BATTALION ]</a>
-        <a href="htmls/battlemap.html">[ BATTLEMAP ]</a>
-        <a href="htmls/Rankings.html">[ CHAIN OF COMMAND ]</a>
-    </nav>
-
-    <div class="container">
-        <h1>TOURNAMENT HUB</h1>
-        <span class="motto">Silent. Precise. Green.</span>
-        
-        <div class="status-bar"><span class="blink">●</span> ENCRYPTION ACTIVE // SELECT MISSION</div>
-        <br>
-        
-        <div class="main-menu">
-            <a href="htmls/nml/1vs1.html" class="nav-link">Blitz-KO<small>Single Elimination</small></a>
-            <a href="htmls/de/DE1vs1.html" class="nav-link">Redemption<small>Double Elimination</small></a>
-            <a href="htmls/rbn/rbn1vs1.html" class="nav-link">Total Engagement<small>Round Robin</small></a>
-            <a href="htmls/manuel.html" class="nav-link">Manual <small>Tunier Modis erklärt!</small></a>
+<div class="hub-container">
+    <header class="hub-header">
+        <div>
+            <h1>COMMAND HUB</h1>
+            <div style="color: var(--army); font-size: 0.7em;">PEPE BATTALION // MAIN INFRASTRUCTURE</div>
         </div>
+        <div class="status-box">
+            <div>SYSTEM: ONLINE</div>
+            <div id="clock"></div>
+        </div>
+    </header>
+
+    <!-- Aktivierte Willkommensnachricht & Intel Feed -->
+    <div class="comm-center">
+        <h3>[ EINGEHENDE NACHRICHT ]</h3>
+        <div class="typewriter">Willkommen zurück, Commander. Alle Systeme sind auf Standby. Erwarte Befehle...</div>
         
-        <div style="margin-top: 35px; font-size: 0.55em; opacity: 0.4; letter-spacing: 1px;">
-            TERMINAL v4.5 - SECURE DATA LINK
+        <div class="intel-ticker">
+            <div class="ticker-content">
+                <span class="ticker-item">Sektor 7G: Patrouille meldet keine Vorkommnisse.</span>
+                <span class="ticker-item">Training: Neue Rekruten für Operation 'Green Frog' eingetroffen.</span>
+                <span class="ticker-item">Comms: Verschlüsselung auf AES-256 aktualisiert.</span>
+                <span class="ticker-item">Warnung: Erhöhte Aktivität in den Grenzsektoren festgestellt.</span>
+                <span class="ticker-item">Log: Verpflegungslieferung (Pepes Pizza) verzögert sich um 10 Min.</span>
+            </div>
         </div>
     </div>
 
-    <footer class="news-flash-footer">
-        <div class="news-title">Intel Feed</div>
-        <div class="ticker-wrapper">
-            <div class="ticker-text">
-                <span class="ticker-item">Operation PEPE BATTALION: All Systems Nominal</span>
-                <span class="ticker-item">Status: Recruiting new Operators...</span>
-                <span class="ticker-item">Intel: Next Tournament Deployment scheduled for 2000 Hours</span>
-                <span class="ticker-item">Warning: Enemy Movement detected in sector 7G</span>
-                <span class="ticker-item">Breaking: Commander PEPE promotes 3 new Sergeants</span>
-                <span class="ticker-item">Weather: High Visibility for tactical insertions</span>
+    <div class="menu-grid">
+        <a href="../tournament-manager/htmls/community.html" class="menu-card">
+            <div>
+                <h2>Pepe Battalion</h2>
+                <p>Personalakten, Werte und Rekrutierungs-Status unserer Division.</p>
             </div>
+            <div class="card-id">MOD-01</div>
+        </a>
+
+        <a href="../tournament-manager/htmls/battlemap.html" class="menu-card">
+            <div>
+                <h2>Battlemap</h2>
+                <p>Live-Überwachung aller Sektoren und Einheiten-Positionen im Echtzeit-Raster.</p>
+            </div>
+            <div class="card-id">MOD-02</div>
+        </a>
+
+        <a href="../tournament-manager/htmls/tbm.html" class="menu-card">
+            <div>
+                <h2>Tournaments</h2>
+                <p>Aktuelle Operationen, Wettkampf-Brackets und Truppenübungen.</p>
+            </div>
+            <div class="card-id">MOD-03</div>
+        </a>
+
+        <a href="../tournament-manager/htmls/Rankings.html" class="menu-card">
+            <div>
+                <h2>Chain of Command</h2>
+                <p>Hierarchie-Übersicht und Personalakten der Offiziere und Spezialisten.</p>
+            </div>
+            <div class="card-id">MOD-04</div>
+        </a>
+    </div>
+
+
+<div class="system-terminal">
+    <div class="terminal-header">
+        <span>>_ SYSTEM_LOG_V2.0.4</span>
+        <span class="blink">REC_</span>
+    </div>
+    <div class="log-container">
+        <div class="log-content">
+            <p>[ OK ] INITIALIZING ENCRYPTION PROTOCOLS...</p>
+            <p>[ OK ] FIREWALL ACTIVE // PEPE-SHIELD V4.2</p>
+            <p style="color: var(--army);">[ INFO ] SCANNING SECTOR 7G... NO THREATS DETECTED.</p>
+            <p>[ OK ] DISCORD COMMS LINK: ESTABLISHED.</p>
+            <p style="color: var(--alert);">[ WARN ] LOW MEMORY IN CACHE_BATTALION_STATS.</p>
+            <p>[ OK ] SATELLITE UPLINK: STABLE.</p>
+            <p style="color: var(--alert);">[ FAIL ] PIZZA DELIVERY INTERCEPTED BY ENEMY FORCES.</p>
+            <p>[ OK ] CALCULATING TOURNAMENT BRACKETS...</p>
+            <p style="color: var(--army);">[ INFO ] 12 OPERATORS CURRENTLY ON STANDBY.</p>
+            <p>[ OK ] ANTI-CHEAT ENGINE: PURGING SYSTEM...</p>
+            <p style="color: var(--alert);">[ WARN ] UNIDENTIFIED UNIT DETECTED IN BATTLEMAP_ALPHA.</p>
+            <p>[ OK ] SYSTEM INTEGRITY: 98.4%</p>
+            <!-- Wiederholung für nahtlosen Loop -->
+            <p>[ OK ] INITIALIZING ENCRYPTION PROTOCOLS...</p>
+            <p>[ OK ] FIREWALL ACTIVE // PEPE-SHIELD V4.2</p>
         </div>
-    </footer>
+    </div>
+</div>
+
+<style>
+    /* CSS für den Terminal-Look */
+    .system-terminal {
+        margin-top: 30px;
+        background: rgba(0, 5, 0, 0.8);
+        border: 1px solid var(--army);
+        padding: 10px;
+        font-size: 0.65em;
+        position: relative;
+    }
+
+    .terminal-header {
+        display: flex;
+        justify-content: space-between;
+        padding-bottom: 5px;
+        border-bottom: 1px solid var(--army);
+        margin-bottom: 10px;
+        color: var(--army);
+        font-weight: bold;
+    }
+
+    .log-container {
+        height: 80px; /* Begrenzt die Höhe, damit es wie ein Fenster wirkt */
+        overflow: hidden;
+        position: relative;
+    }
+
+    .log-content {
+        display: flex;
+        flex-direction: column;
+        animation: scroll-log 20s linear infinite;
+    }
+
+    .log-content p {
+        margin-bottom: 4px;
+        letter-spacing: 1px;
+    }
+
+    @keyframes scroll-log {
+        0% { transform: translateY(0); }
+        100% { transform: translateY(-50%); } /* Scrollt bis zur Hälfte (dem Duplikat) */
+    }
+
+    .blink { animation: blinker 1s linear infinite; }
+    @keyframes blinker { 50% { opacity: 0; } }
+</style>
+
+</div>
+
+<script>
+    function updateClock() {
+        const now = new Date();
+        const time = now.toLocaleTimeString('de-DE') + ' ZULU';
+        document.getElementById('clock').textContent = time;
+    }
+    setInterval(updateClock, 1000);
+    updateClock();
+</script>
 
 </body>
 </html>

@@ -6,52 +6,73 @@
     <title>Tactical Duel Control | 1vs1</title>
     <style>
         :root { 
-            --army-green: #4b5320; 
-            --bright-green: #a3b18a; 
-            --neon-green: #00ff41; 
-            --card-bg: rgba(15, 20, 10, 0.95);
-        }
+        /* Vereinheitlichte Variablen für das gesamte Battalion */
+        --accent: #00ff41; 
+        --army: #4b5320; 
+        --bright-green: #a3b18a; 
+        --neon-green: #00ff41; /* Beibehalten für Kompatibilität */
+        --card-bg: rgba(15, 20, 10, 0.95);
+    }
 
-        body { 
-            font-family: 'Courier New', monospace; 
-            background-color: #a7a7a7;
-            background-image: url('DEIN_HINTERGRUND.gif'); 
-            background-size: cover;
-            background-attachment: fixed;
-            color: var(--neon-green); 
-            margin: 0;
-            padding-top: 80px;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            min-height: 100vh;
-        }
+    /* ... (restlicher Body-Style bleibt gleich) ... */
 
-        /* Abdunklung und Scanlines */
-        .overlay {
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(0, 0, 0, 0.8); /* Abdunklung */
-            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%); /* Pixel-Scanlines */
-            background-size: 100% 4px;
-            z-index: 1;
-            pointer-events: none;
-        }
+    body {
+        font-family: 'Courier New', monospace;
+        background-color: #050a05;
+        background-image:
+            linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+        background-size: 40px 40px;
+        color: var(--accent); /* Gefixt: Nutzt jetzt die korrekte Variable */
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        min-height: 100vh;
+        padding: 20px;
+        padding-top: 100px; /* Leicht erhöht für besseren Abstand zur Nav */
+        padding-bottom: 60px;
+    }
 
-        .top-nav {
-            position: fixed; top: 0; left: 0; width: 100%;
-            background: rgba(10, 15, 10, 0.95); border-bottom: 1px solid var(--army-green);
-            z-index: 9999; display: flex; justify-content: center; gap: 10px; padding: 12px 0;
-        }
-        .top-nav a {
-            color: var(--neon-green); text-decoration: none; font-size: 0.75em;
-            font-weight: bold; padding: 6px 12px; text-transform: uppercase; border: 1px solid transparent;
-        }
+    /* NAVIGATION FIX */
+    .top-nav {
+        position: fixed; 
+        top: 0; 
+        left: 0; 
+        width: 100%;
+        background: rgba(10, 15, 10, 0.98); 
+        border-bottom: 1px solid var(--army); /* Gefixt: Variable korrigiert */
+        z-index: 9999; 
+        display: flex; 
+        justify-content: center; 
+        gap: 15px; 
+        padding: 15px 0;
+    }
 
-        h1, .card { position: relative; z-index: 10; }
+    .top-nav a {
+        color: var(--accent); 
+        text-decoration: none; 
+        font-size: 0.75em;
+        font-weight: bold; 
+        padding: 8px 16px; 
+        text-transform: uppercase; 
+        border: 1px solid transparent;
+        transition: 0.2s ease-in-out;
+    }
+
+    .top-nav a:hover { 
+        border: 1px solid var(--accent); 
+        background: rgba(0, 255, 65, 0.1); 
+        text-shadow: 0 0 5px var(--accent);
+    }
+
+    /* Markierung für die aktive Seite */
+    .top-nav a.active {
+        background: rgba(0, 255, 65, 0.1); 
+        border: 1px solid var(--accent);
+        box-shadow: inset 0 0 10px rgba(0, 255, 65, 0.2);
+    }
+        
+        h1, .card { position: relative; z-index: 10; } 
 
         .card { 
             background: var(--card-bg); padding: 25px; 
@@ -113,8 +134,9 @@
     <div class="overlay"></div>
 
     <nav class="top-nav">
-        <a href="../../index.html">[ HUB ]</a>
-        <a href="1vs1.html" style="background: rgba(0,255,65,0.1); border-color: var(--neon-green);">[ 1VS1 ]</a>
+        <a href="../../index.html">[ MAIN ]</a>
+        <a href="../../htmls/tbm.html">[ HUB ]</a>
+        <a href="1vs1.html" class="active">[ 1VS1 ]</a>
         <a href="2vs2.html">[ 2VS2 ]</a>
         <a href="3vs3.html">[ 3VS3 ]</a>
         <a href="5vs5.html">[ 5VS5 ]</a>

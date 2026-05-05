@@ -10,29 +10,38 @@
             --bright: #a3b18a;
         }
 
-        body { 
-            font-family: 'Courier New', monospace; 
-            background-color: #ffffff;
-            background-image: url('DEIN_HINTERGRUND.gif'); 
-            background-size: cover; 
-            background-attachment: fixed; 
-            color: var(--accent); 
-            margin: 0; 
-            padding-top: 80px;
-            display: flex; 
-            flex-direction: column; 
+        body {
+            font-family: 'Courier New', monospace;
+            background-color: #050a05;
+            background-image:
+                linear-gradient(rgba(0,255,65,0.03) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0,255,65,0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
+            color: var(--accent);
+            display: flex;
+            flex-direction: column;
             align-items: center;
             min-height: 100vh;
+            padding: 20px;
+            padding-top: 90px;
+            padding-bottom: 60px;
         }
 
-        /* SCANLINES & ABDUNKLUNG */
-        .overlay {
-            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
-            background: rgba(0, 0, 0, 0.8); /* Dunkelt das Hintergrund-GIF ab */
-            background-image: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.2) 50%);
-            background-size: 100% 4px;
-            z-index: 1; /* Hinter dem Content */
-            pointer-events: none; /* WICHTIG: Klicks gehen durch das Overlay durch! */
+        /* scanline overlay */
+        body::after {
+            content: "";
+            position: fixed;
+            top: 0; left: 0;
+            width: 100%; height: 100%;
+            background: repeating-linear-gradient(
+                0deg,
+                transparent,
+                transparent 2px,
+                rgba(0,0,0,0.07) 2px,
+                rgba(0,0,0,0.07) 4px
+            );
+            pointer-events: none;
+            z-index: 9999;
         }
 
         /* NAVIGATION */
@@ -85,9 +94,10 @@
     <div class="overlay"></div>
 
     <nav class="top-nav">
-        <a href="../../index.html">[ HUB ]</a>
+        <a href="../../index.html">[ MAIN ]</a>
+        <a href="../../htmls/tbm.html">[ HUB ]</a>
         <a href="1vs1.html">[ 1VS1 ]</a>
-        <a href="2vs2.html">[ 2VS2 ]</a>
+        <a href="2vs2.html" style="background: rgba(0,255,65,0.1); border-color: var(--neon-green);">[ 2VS2 ]</a>
         <a href="3vs3.html">[ 3VS3 ]</a>
         <a href="5vs5.html">[ 5VS5 ]</a>
     </nav>
