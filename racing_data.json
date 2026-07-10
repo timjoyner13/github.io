@@ -1,0 +1,467 @@
+{
+    "players": {
+        "Tim": {
+            "fh6": 0,
+            "f1": 108,
+            "ac": 0,
+            "bio": "",
+            "avatar_url": ""
+        },
+        "peter": {
+            "fh6": 0,
+            "f1": 84,
+            "ac": 0,
+            "bio": "",
+            "avatar_url": ""
+        },
+        "hanz": {
+            "fh6": 0,
+            "f1": 98,
+            "ac": 0,
+            "bio": "",
+            "avatar_url": ""
+        }
+    },
+    "events": [
+        {
+            "game": "F1 2026",
+            "name": "TEST1",
+            "type": "Time Attack",
+            "track": "Albert Park, Melbourne 🇦🇺",
+            "track_url": "https://formula-timer.com/_next/image?url=%2Fcircuits%2Falbert_park.png&w=1080&q=75",
+            "results": [
+                {
+                    "player": "Tim",
+                    "team": "Red Bull Racing",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 1,
+                    "points": 25
+                },
+                {
+                    "player": "peter",
+                    "team": "Scuderia Ferrari",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 2,
+                    "points": 18
+                },
+                {
+                    "player": "hanz",
+                    "team": "Mercedes-AMG",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 3,
+                    "points": 15
+                }
+            ],
+            "id": "b315a5f5b2a04551bced4a27355cd70c"
+        },
+        {
+            "game": "F1 2026",
+            "name": "TEST2",
+            "type": "Time Attack",
+            "track": "Suzuka 🇯🇵",
+            "track_url": "https://formula-timer.com/_next/image?url=%2Fcircuits%2Fsuzuka.png&w=1080&q=75",
+            "results": [
+                {
+                    "player": "Tim",
+                    "team": "Red Bull Racing",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 1,
+                    "points": 25
+                },
+                {
+                    "player": "hanz",
+                    "team": "Mercedes-AMG",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 2,
+                    "points": 18
+                },
+                {
+                    "player": "peter",
+                    "team": "Scuderia Ferrari",
+                    "time": 105.462,
+                    "display_time": "01:45.462",
+                    "position": 3,
+                    "points": 15
+                }
+            ],
+            "id": "f26117e95fd34deca4e0bc3cd21d8c38"
+        },
+        {
+            "game": "F1 2026",
+            "name": "TEST3",
+            "type": "Renntag",
+            "track": "Suzuka 🇯🇵",
+            "track_url": "https://formula-timer.com/_next/image?url=%2Fcircuits%2Fsuzuka.png&w=1080&q=75",
+            "sessions": {
+                "rd_q": [
+                    {
+                        "player": "hanz",
+                        "team": "Mercedes-AMG",
+                        "position": 1,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    },
+                    {
+                        "player": "peter",
+                        "team": "Scuderia Ferrari",
+                        "position": 2,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    },
+                    {
+                        "player": "Tim",
+                        "team": "Red Bull Racing",
+                        "position": 3,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    }
+                ],
+                "rd_race": [
+                    {
+                        "player": "hanz",
+                        "team": "Mercedes-AMG",
+                        "position": 1,
+                        "best_time": "01.45.462",
+                        "points": 25,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "peter",
+                        "team": "Scuderia Ferrari",
+                        "position": 2,
+                        "best_time": "01.45.462",
+                        "points": 18,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "Tim",
+                        "team": "Red Bull Racing",
+                        "position": 3,
+                        "best_time": "01.45.462",
+                        "points": 15,
+                        "metric": "Keine"
+                    }
+                ]
+            },
+            "results": [
+                {
+                    "player": "hanz",
+                    "team": "Mercedes-AMG",
+                    "position": 1,
+                    "best_time": "01.45.462",
+                    "points": 25,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "peter",
+                    "team": "Scuderia Ferrari",
+                    "position": 2,
+                    "best_time": "01.45.462",
+                    "points": 18,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "Tim",
+                    "team": "Red Bull Racing",
+                    "position": 3,
+                    "best_time": "01.45.462",
+                    "points": 15,
+                    "metric": "Keine"
+                }
+            ],
+            "id": "0c94d033096b4d1f8ebc9e28bb63ad8e"
+        },
+        {
+            "game": "F1 2026",
+            "name": "TEST4",
+            "type": "Renntag",
+            "track": "Bahrain International Circuit 🇧🇭",
+            "track_url": "https://formula-timer.com/_next/image?url=%2Fcircuits%2Fbahrain.png&w=1080&q=75",
+            "sessions": {
+                "rd_q": [],
+                "rd_race": [
+                    {
+                        "player": "hanz",
+                        "team": "Mercedes-AMG",
+                        "position": 1,
+                        "best_time": "01.45.462",
+                        "points": 25,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "Tim",
+                        "team": "Red Bull Racing",
+                        "position": 2,
+                        "best_time": "01.45.462",
+                        "points": 18,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "peter",
+                        "team": "Scuderia Ferrari",
+                        "position": 3,
+                        "best_time": "01.45.462",
+                        "points": 15,
+                        "metric": "Keine"
+                    }
+                ]
+            },
+            "results": [
+                {
+                    "player": "hanz",
+                    "team": "Mercedes-AMG",
+                    "position": 1,
+                    "best_time": "01.45.462",
+                    "points": 25,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "Tim",
+                    "team": "Red Bull Racing",
+                    "position": 2,
+                    "best_time": "01.45.462",
+                    "points": 18,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "peter",
+                    "team": "Scuderia Ferrari",
+                    "position": 3,
+                    "best_time": "01.45.462",
+                    "points": 15,
+                    "metric": "Keine"
+                }
+            ],
+            "id": "4faa1953a1b04f738b593aaabd65ba65"
+        },
+        {
+            "game": "F1 2026",
+            "name": "TEST5",
+            "type": "Renntag",
+            "track": "Suzuka 🇯🇵",
+            "track_url": "https://formula-timer.com/_next/image?url=%2Fcircuits%2Fsuzuka.png&w=1080&q=75",
+            "sessions": {
+                "rd_q": [
+                    {
+                        "player": "Tim",
+                        "team": "Red Bull Racing",
+                        "position": 1,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    },
+                    {
+                        "player": "hanz",
+                        "team": "Mercedes-AMG",
+                        "position": 2,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    },
+                    {
+                        "player": "peter",
+                        "team": "Scuderia Ferrari",
+                        "position": 3,
+                        "best_time": "01.45.462",
+                        "points": 0
+                    }
+                ],
+                "rd_race": [
+                    {
+                        "player": "Tim",
+                        "team": "Red Bull Racing",
+                        "position": 1,
+                        "best_time": "01.45.462",
+                        "points": 25,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "peter",
+                        "team": "Scuderia Ferrari",
+                        "position": 2,
+                        "best_time": "01.45.462",
+                        "points": 18,
+                        "metric": "Keine"
+                    },
+                    {
+                        "player": "hanz",
+                        "team": "Mercedes-AMG",
+                        "position": 3,
+                        "best_time": "01.45.462",
+                        "points": 15,
+                        "metric": "Keine"
+                    }
+                ]
+            },
+            "results": [
+                {
+                    "player": "Tim",
+                    "team": "Red Bull Racing",
+                    "position": 1,
+                    "best_time": "01.45.462",
+                    "points": 25,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "peter",
+                    "team": "Scuderia Ferrari",
+                    "position": 2,
+                    "best_time": "01.45.462",
+                    "points": 18,
+                    "metric": "Keine"
+                },
+                {
+                    "player": "hanz",
+                    "team": "Mercedes-AMG",
+                    "position": 3,
+                    "best_time": "01.45.462",
+                    "points": 15,
+                    "metric": "Keine"
+                }
+            ],
+            "id": "fcdb481ec5fc4f6e81ee81b025b97e3d"
+        }
+    ],
+    "ac_teams": [
+        "Privatfahrer",
+        "Team Rot",
+        "Team Blau",
+        "Team Grün"
+    ],
+    "custom_tracks": {},
+    "custom_games": {},
+    "points_map": [
+        25,
+        18,
+        15,
+        12,
+        10,
+        8,
+        6,
+        4,
+        2,
+        1
+    ],
+    "points_maps": {},
+    "custom_colors": {},
+    "player_teams": {
+        "Tim": {
+            "f1": "Red Bull Racing"
+        },
+        "peter": {
+            "f1": "Scuderia Ferrari"
+        },
+        "hanz": {
+            "f1": "Mercedes-AMG"
+        }
+    },
+    "leaderboards": {},
+    "hidden_hints": [
+        "planning",
+        "tires_intro",
+        "home",
+        "fh6",
+        "session_f1"
+    ],
+    "planned_events": [
+        {
+            "id": "8dd81f2041de4125ac06102194f325af",
+            "title": "Mono F1 Liga Test",
+            "date": "18.05.1923",
+            "time": "",
+            "game": "F1 2026",
+            "track": "Albert Park",
+            "format": "deine mama",
+            "meet": "# Talk1",
+            "notes": "",
+            "reminder_sent": false
+        },
+        {
+            "id": "9302bf828d654bbf89488202673f5342",
+            "title": "blyat",
+            "date": "Jeden Freitag",
+            "time": "20:00",
+            "game": "Assetto Corsa",
+            "track": "Offizieller Rennkalander",
+            "format": "Full Weekends (incl. Sprint)",
+            "meet": "IrgendeinTalkduHUAN",
+            "notes": "Rechnet mit mindestens 3std pro Eventabend ein und nem Dickslap ihr versweateten Jungfrauen.",
+            "reminder_sent": false
+        }
+    ],
+    "discord_webhook_url": "",
+    "app_users": [
+        ""
+    ],
+    "active_user": "TimJoyner",
+    "tire_compounds": {
+        "soft": {
+            "label": "Soft",
+            "standard": true,
+            "base_laps": 16,
+            "base_deg": 0.14,
+            "is_dry": true,
+            "wear_pct": 5.0
+        },
+        "medium": {
+            "label": "Medium",
+            "standard": true,
+            "base_laps": 26,
+            "base_deg": 0.09,
+            "is_dry": true,
+            "wear_pct": 5.0
+        },
+        "hart": {
+            "label": "Hart",
+            "standard": true,
+            "base_laps": 38,
+            "base_deg": 0.05,
+            "is_dry": true,
+            "wear_pct": 5.0
+        },
+        "wet": {
+            "label": "Wet",
+            "standard": true,
+            "base_laps": 22,
+            "base_deg": 0.11,
+            "is_dry": false,
+            "wear_pct": 5.0
+        },
+        "inters": {
+            "label": "Inters",
+            "standard": true,
+            "base_laps": 20,
+            "base_deg": 0.13,
+            "is_dry": false,
+            "wear_pct": 5.0
+        }
+    },
+    "tire_stints": [],
+    "discord_webhooks": {},
+    "discord_preview_enabled": true,
+    "reminder_enabled": true,
+    "reminder_hours_before": 24,
+    "tire_strategies": [],
+    "tire_f1_laptimes": {
+        "Baku City Circuit 🇦🇿": {
+            "hart": 102.456,
+            "medium": 95.0,
+            "soft": 89.054
+        }
+    },
+    "auto_backup_enabled": true,
+    "last_auto_backup": "2026-07-09T19:16:36",
+    "track_conditions": {
+        "Hungaroring 🇭🇺": {
+            "weather": "Trocken",
+            "temp": 105.0
+        },
+        "Baku City Circuit 🇦🇿": {
+            "weather": "Trocken",
+            "temp": 105.0
+        }
+    }
+}
