@@ -1,0 +1,715 @@
+<!DOCTYPE html>
+<html lang="de">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Mono — Community</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@500;700&family=Inter:wght@400;500;600&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+<style>
+  :root{
+    --bg:#0a0a0c;
+    --surface:#141417;
+    --surface-2:#1c1c21;
+    --line:#28282e;
+    --fg:#f4f4f6;
+    --fg-dim:#8f8f98;
+    --fg-faint:#57575f;
+
+    /* Kategoriefarben -- fest zugeordnet, nicht dekorativ austauschbar */
+    --c-racing:#a35cff;
+    --c-tournament:#33d6c8;
+    --c-social:#ff5ca8;
+    --c-amongus:#f2b73a;
+
+    --gold:#e8c23a; --silver:#c7ccd6; --bronze:#c98a4b;
+  }
+  *{ box-sizing:border-box; }
+  html{ scroll-behavior:smooth; }
+  body{ margin:0; background:var(--bg); color:var(--fg); font-family:'Inter', sans-serif; line-height:1.5; }
+  h1,h2,h3,.display{ font-family:'Space Grotesk', sans-serif; margin:0; }
+  .mono{ font-family:'JetBrains Mono', monospace; font-variant-numeric:tabular-nums; }
+  a{ color:inherit; }
+  .wrap{ max-width:1120px; margin:0 auto; padding:0 32px; }
+  @media (max-width:640px){ .wrap{ padding:0 20px; } }
+
+  nav{ position:sticky; top:0; z-index:30; background:rgba(10,10,12,0.9); backdrop-filter:blur(8px); border-bottom:1px solid var(--line); }
+  nav .wrap{ display:flex; align-items:center; justify-content:space-between; height:64px; }
+  .brand{ font-size:20px; font-weight:700; letter-spacing:-0.01em; display:flex; align-items:center; gap:10px; }
+  .brand .dots{ display:flex; gap:4px; }
+  .brand .dots span{ width:7px; height:7px; border-radius:50%; display:inline-block; }
+  .navlinks{ display:flex; gap:28px; font-size:14px; color:var(--fg-dim); align-items:center; }
+  .navlinks a{ text-decoration:none; }
+  .navlinks a:hover{ color:var(--fg); }
+  .navlinks .cta{ background:var(--fg); color:var(--bg); padding:8px 16px; border-radius:5px; font-weight:600; }
+  .navlinks .cta:hover{ opacity:0.85; }
+
+  .hero{ padding:88px 0 76px; border-bottom:1px solid var(--line); }
+  .hero .wrap{ max-width:760px; }
+  .hero h1{ font-size:50px; line-height:1.08; font-weight:700; letter-spacing:-0.02em; }
+  @media (max-width:640px){ .hero h1{ font-size:36px; } }
+  .hero p.lead{ color:var(--fg-dim); font-size:17px; margin-top:20px; max-width:52ch; }
+  .hero-actions{ display:flex; gap:12px; margin-top:32px; flex-wrap:wrap; }
+  .btn{ display:inline-flex; align-items:center; gap:8px; padding:12px 22px; border-radius:5px; font-weight:600; font-size:14px; text-decoration:none; cursor:pointer; border:1px solid transparent; }
+  .btn-primary{ background:var(--fg); color:var(--bg); }
+  .btn-primary:hover{ opacity:0.85; }
+  .btn-ghost{ background:transparent; color:var(--fg); border-color:var(--line); }
+  .btn-ghost:hover{ border-color:var(--fg-dim); }
+
+  .category-row{ display:flex; gap:22px; margin-top:40px; flex-wrap:wrap; }
+  .category-row .item{ display:flex; align-items:center; gap:8px; font-size:13px; color:var(--fg-dim); }
+  .category-row .swatch{ width:9px; height:9px; border-radius:50%; }
+
+  .sparten{ padding:80px 0; border-bottom:1px solid var(--line); }
+  .section-head{ margin-bottom:32px; max-width:640px; }
+  .section-head h2{ font-size:28px; font-weight:700; }
+  .section-head p{ color:var(--fg-dim); font-size:15px; margin-top:10px; }
+
+  .sparten-grid{ display:grid; grid-template-columns:repeat(2,1fr); gap:14px; }
+  @media (max-width:760px){ .sparten-grid{ grid-template-columns:1fr; } }
+  .sparte-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:26px 26px 24px; position:relative; overflow:hidden; }
+  .sparte-card::before{ content:''; position:absolute; top:0; left:0; bottom:0; width:3px; }
+  .sparte-card.racing::before{ background:var(--c-racing); }
+  .sparte-card.tournament::before{ background:var(--c-tournament); }
+  .sparte-card.social::before{ background:var(--c-social); }
+  .sparte-card.amongus::before{ background:var(--c-amongus); }
+  .sparte-card .tag{ font-size:12px; font-weight:600; margin-bottom:10px; }
+  .sparte-card.racing .tag{ color:var(--c-racing); }
+  .sparte-card.tournament .tag{ color:var(--c-tournament); }
+  .sparte-card.social .tag{ color:var(--c-social); }
+  .sparte-card.amongus .tag{ color:var(--c-amongus); }
+  .sparte-card h3{ font-size:19px; font-weight:700; }
+  .sparte-card p{ color:var(--fg-dim); font-size:14px; margin-top:10px; }
+  .sparte-card .meta{ margin-top:16px; font-size:12px; color:var(--fg-faint); }
+
+  .termine{ padding:80px 0; border-bottom:1px solid var(--line); }
+  .termin-list{ border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .termin-row{ display:flex; align-items:center; gap:18px; padding:18px 22px; border-bottom:1px solid var(--line); background:var(--surface); }
+  .termin-row:last-child{ border-bottom:none; }
+  .termin-row .swatch{ width:8px; height:8px; border-radius:50%; flex:none; }
+  .termin-row .date{ font-family:'JetBrains Mono',monospace; font-size:13px; color:var(--fg-dim); width:110px; flex:none; }
+  .termin-row .info{ flex:1; }
+  .termin-row .title{ font-weight:600; font-size:15px; }
+  .termin-row .sub{ color:var(--fg-dim); font-size:13px; margin-top:2px; }
+  .termin-row .cat-label{ font-size:12px; color:var(--fg-faint); flex:none; }
+  @media (max-width:640px){ .termin-row{ flex-wrap:wrap; } .termin-row .date{ width:auto; } }
+
+  .live-example{ padding:80px 0; border-bottom:1px solid var(--line); }
+  .pill-row{ display:flex; gap:8px; flex-wrap:wrap; }
+  .pill-row button{
+    background:transparent; border:1px solid var(--line); color:var(--fg-dim);
+    padding:6px 14px; border-radius:20px; font-size:13px; cursor:pointer; font-family:'Inter',sans-serif;
+  }
+  .pill-row button.active{ background:var(--c-racing); border-color:var(--c-racing); color:#fff; font-weight:600; }
+  .record-row{ display:flex; justify-content:space-between; padding:6px 0; border-bottom:1px solid var(--line); }
+  .record-row:last-child{ border-bottom:none; }
+  .record-row .val{ color:var(--fg); font-family:'JetBrains Mono',monospace; }
+  .live-badge{ display:inline-flex; align-items:center; gap:7px; font-size:12px; color:var(--fg-dim); border:1px solid var(--line); padding:5px 12px; border-radius:20px; margin-bottom:18px; }
+  .live-dot{ width:6px; height:6px; border-radius:50%; background:var(--c-racing); animation:pulse 2s infinite; }
+  @media (prefers-reduced-motion: reduce){ .live-dot{ animation:none; } }
+  @keyframes pulse{ 0%{box-shadow:0 0 0 0 rgba(163,92,255,.5);} 70%{box-shadow:0 0 0 7px rgba(163,92,255,0);} 100%{box-shadow:0 0 0 0 rgba(163,92,255,0);} }
+
+  .live-grid{ display:grid; grid-template-columns:1.3fr 1fr; gap:32px; }
+  @media (max-width:860px){ .live-grid{ grid-template-columns:1fr; } }
+  .standings{ border:1px solid var(--line); border-radius:10px; overflow:hidden; }
+  .standings table{ width:100%; border-collapse:collapse; font-size:14px; }
+  .standings th{ text-align:left; padding:10px 16px; color:var(--fg-dim); font-weight:500; font-size:12px; border-bottom:1px solid var(--line); background:var(--surface); }
+  .standings td{ padding:11px 16px; border-bottom:1px solid var(--line); }
+  .standings tr:last-child td{ border-bottom:none; }
+  .standings td.pos{ font-family:'JetBrains Mono',monospace; width:36px; color:var(--fg-dim); }
+  .standings tr.p1 td.pos{ color:var(--gold); font-weight:700; }
+  .standings tr.p2 td.pos{ color:var(--silver); font-weight:700; }
+  .standings tr.p3 td.pos{ color:var(--bronze); font-weight:700; }
+  .standings td.pts{ font-family:'JetBrains Mono',monospace; text-align:right; }
+
+  .podium-card{ background:var(--surface); border:1px solid var(--line); border-radius:10px; padding:22px 24px; }
+  .podium-card .label{ font-size:12px; color:var(--fg-dim); margin-bottom:14px; }
+  .podium-row{ display:flex; align-items:center; justify-content:space-between; padding:10px 0; border-bottom:1px solid var(--line); font-size:14px; }
+  .podium-row:last-child{ border-bottom:none; }
+  .podium-row .medal{ width:22px; font-family:'JetBrains Mono',monospace; }
+  .podium-row.gold .medal{ color:var(--gold); }
+  .podium-row.silver .medal{ color:var(--silver); }
+  .podium-row.bronze .medal{ color:var(--bronze); }
+  .podium-row .time{ color:var(--fg-dim); font-family:'JetBrains Mono',monospace; font-size:13px; }
+
+  .ctaband{ padding:72px 0; }
+  .ctaband .box{ background:var(--surface); border:1px solid var(--line); border-radius:12px; padding:44px 40px; display:flex; justify-content:space-between; align-items:center; gap:24px; flex-wrap:wrap; position:relative; overflow:hidden; }
+  .ctaband .box::after{ content:''; position:absolute; top:0; right:0; width:5px; height:100%; background:linear-gradient(180deg, var(--c-racing), var(--c-tournament), var(--c-social), var(--c-amongus)); }
+  .ctaband h2{ font-size:24px; font-weight:700; max-width:26ch; }
+  .ctaband p{ color:var(--fg-dim); margin-top:8px; font-size:14px; }
+
+  footer{ border-top:1px solid var(--line); padding:32px 0; }
+  footer .wrap{ display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px; }
+  footer, footer .fg-dim{ color:var(--fg-dim); font-size:13px; }
+  footer .flinks{ display:flex; gap:20px; }
+  footer a{ text-decoration:none; }
+  footer a:hover{ color:var(--fg); }
+
+  .cfg-toggle{ position:fixed; right:18px; bottom:18px; width:36px; height:36px; border-radius:50%; background:var(--surface); border:1px solid var(--line); color:var(--fg-dim); display:flex; align-items:center; justify-content:center; cursor:pointer; font-size:15px; z-index:40; }
+  .cfg-panel{ position:fixed; right:18px; bottom:64px; width:280px; background:var(--surface-2); border:1px solid var(--line); border-radius:8px; padding:14px; display:none; z-index:40; }
+  .cfg-panel.open{ display:block; }
+  .cfg-panel label{ font-size:12px; color:var(--fg-dim); display:block; margin-bottom:6px; }
+  .cfg-panel input{ width:100%; background:var(--bg); border:1px solid var(--line); color:var(--fg); padding:8px 10px; border-radius:4px; font-size:13px; font-family:'JetBrains Mono',monospace; }
+  .cfg-panel button{ margin-top:10px; width:100%; background:var(--fg); color:var(--bg); border:none; padding:8px; border-radius:4px; font-weight:600; cursor:pointer; font-size:13px; }
+  .cfg-status{ font-size:11px; margin-top:8px; color:var(--fg-dim); }
+</style>
+</head>
+<body>
+
+<nav>
+  <div class="wrap">
+    <div class="brand">
+      <div class="dots">
+        <span style="background:var(--c-racing)"></span>
+        <span style="background:var(--c-tournament)"></span>
+        <span style="background:var(--c-social)"></span>
+        <span style="background:var(--c-amongus)"></span>
+      </div>
+      MONO
+    </div>
+    <div class="navlinks">
+      <a href="#sparten">Was läuft</a>
+      <a href="#termine">Termine</a>
+      <a href="live.html">Live-Daten</a>
+      <a class="cta" href="#join">Discord beitreten</a>
+    </div>
+  </div>
+</nav>
+
+<section class="hero">
+  <div class="wrap">
+    <h1>Eine Community, viele Abende.</h1>
+    <p class="lead">Mono ist kein Racing-Team, das nebenbei was anderes macht — Mono ist die Gruppe zuerst. Manchmal fahren wir Rennen, manchmal Turniere, manchmal reden wir einfach nur im Voice-Chat. Was ansteht, kommt hier rein.</p>
+    <div class="hero-actions">
+      <a class="btn btn-primary" href="#join">Discord beitreten</a>
+      <a class="btn btn-ghost" href="#termine">Nächste Termine</a>
+    </div>
+    <div class="category-row">
+      <div class="item"><span class="swatch" style="background:var(--c-racing)"></span>Racing</div>
+      <div class="item"><span class="swatch" style="background:var(--c-tournament)"></span>Turniere</div>
+      <div class="item"><span class="swatch" style="background:var(--c-social)"></span>Community-Abende</div>
+      <div class="item"><span class="swatch" style="background:var(--c-amongus)"></span>Among Us</div>
+    </div>
+    <div class="live-badge" style="margin-top:22px;"><span class="live-dot"></span><span id="heroNextEvent">Lade nächsten Termin …</span></div>
+  </div>
+</section>
+
+<section class="sparten" id="sparten">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Was bei uns läuft</h2>
+      <p>Racing, Turniere und Among Us ziehen live aus dem Event Manager — nur Community-Abende sind dort (noch) nicht erfasst.</p>
+    </div>
+    <div class="sparten-grid">
+      <div class="sparte-card racing">
+        <div class="tag">Racing</div>
+        <h3>Liga &amp; Meisterschaft</h3>
+        <p>Feste Rennabende mit eigenem Punktesystem, über die Saison ausgetragen. Ergebnisse landen direkt in der Tabelle unten.</p>
+        <div class="meta" id="sparteRacingMeta">Lade Live-Daten …</div>
+      </div>
+      <div class="sparte-card tournament">
+        <div class="tag">Turniere</div>
+        <h3>Swiss- &amp; K.o.-Runden</h3>
+        <p>Zwischendurch gibt's kurze Turnierformate, auch abseits vom Racing — von 1-gegen-1 bis Team-Brackets.</p>
+        <div class="meta" id="sparteTournamentMeta">Lade Live-Daten …</div>
+      </div>
+      <div class="sparte-card social">
+        <div class="tag">Community-Abende</div>
+        <h3>Einfach mal quatschen</h3>
+        <p>Kein Wettkampf, kein Ergebnis — nur Leute, die sich im Voice-Chat treffen, wenn Zeit da ist.</p>
+        <div class="meta">Noch nicht im Event Manager erfasst</div>
+      </div>
+      <div class="sparte-card amongus">
+        <div class="tag">Among Us</div>
+        <h3>Crewmates vs. Impostors</h3>
+        <p>Rundenbasiert mit eigenem Punktesystem und einer Trophäenwand — wer verrät, wer überlebt?</p>
+        <div class="meta" id="sparteAmongUsMeta">Lade Live-Daten …</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="termine" id="termine">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Kommende Termine</h2>
+      <p>Direkt aus dem Event Manager — aktuell ausschließlich Racing-Termine, weitere Sparten folgen, sobald sie dort geplant werden.</p>
+    </div>
+    <div class="termin-list" id="termineList">
+      <div class="termin-row"><div class="info"><div class="sub">Noch keine Daten geladen.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="termine" id="turniere" style="border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="section-head">
+      <h2>Turniere</h2>
+      <p>Alle Turniere aus dem Event Manager, live.</p>
+    </div>
+    <div class="termin-list" id="tournamentList">
+      <div class="termin-row"><div class="info"><div class="sub">Noch keine Daten geladen.</div></div></div>
+    </div>
+  </div>
+</section>
+
+<section class="live-example">
+  <div class="wrap">
+    <div class="live-badge"><span class="live-dot"></span>Live aus dem Event Manager</div>
+    <div class="section-head" style="margin-bottom:20px;">
+      <h2>Racing-Statistiken</h2>
+      <p>Punktestand, Siege, Poles und schnellste Zeit — direkt aus den Renndaten berechnet, nach Spiel filterbar.</p>
+    </div>
+    <div class="pill-row" id="gameFilter"></div>
+    <div class="live-grid" style="margin-top:20px;">
+      <div class="standings">
+        <table>
+          <thead><tr><th>#</th><th>Fahrer</th><th style="text-align:right">Siege</th><th style="text-align:right">Podien</th><th style="text-align:right">Poles</th><th style="text-align:right">Punkte</th></tr></thead>
+          <tbody id="standingsBody">
+            <tr><td colspan="6" style="padding:20px 16px;color:var(--fg-dim)">Noch keine Daten geladen.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="display:flex; flex-direction:column; gap:14px;">
+        <div class="podium-card">
+          <div class="label">Rekorde</div>
+          <div id="recordsBox" style="font-size:13px; color:var(--fg-dim);">Noch keine Daten geladen.</div>
+        </div>
+        <div class="podium-card">
+          <div class="label" id="lastRaceLabel">Letztes Rennen</div>
+          <div id="lastRaceTitle" style="font-weight:700;font-family:'Space Grotesk',sans-serif;font-size:16px;margin-bottom:10px;">—</div>
+          <div id="podiumBox"><div style="color:var(--fg-dim);font-size:13px;">Noch keine Daten geladen.</div></div>
+        </div>
+        <div class="podium-card">
+          <div class="label">Teams</div>
+          <div id="teamsBox" style="display:flex;gap:6px;flex-wrap:wrap;"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="live-example" id="amongus" style="border-bottom:1px solid var(--line);">
+  <div class="wrap">
+    <div class="live-badge"><span class="live-dot" style="background:var(--c-amongus)"></span>Live aus dem Event Manager</div>
+    <div class="section-head" style="margin-bottom:24px;">
+      <h2>Among Us</h2>
+      <p>Rangliste aus allen gespielten Runden, plus Trophäenwand mit den tatsächlich freigeschalteten Achievements.</p>
+    </div>
+    <div class="live-grid">
+      <div class="standings">
+        <table>
+          <thead><tr><th>#</th><th>Spieler</th><th style="text-align:right">Runden</th><th style="text-align:right">Siege</th><th style="text-align:right">Punkte</th></tr></thead>
+          <tbody id="amongUsStandingsBody">
+            <tr><td colspan="5" style="padding:20px 16px;color:var(--fg-dim)">Noch keine Daten geladen.</td></tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="podium-card">
+        <div class="label">Trophäenwand</div>
+        <div id="achievementsBox" style="font-size:13px; color:var(--fg-dim);">Noch keine Daten geladen.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section class="ctaband" id="join">
+  <div class="wrap">
+    <div class="box">
+      <div>
+        <h2>Schau einfach mal vorbei.</h2>
+        <p>Du musst dich für nichts festlegen — tritt dem Discord bei und guck, was gerade läuft.</p>
+      </div>
+      <a class="btn btn-primary" href="#" id="discordLink">Discord beitreten</a>
+    </div>
+  </div>
+</section>
+
+<footer>
+  <div class="wrap">
+    <div>© Mono Community</div>
+    <div class="flinks">
+      <a href="#sparten">Was läuft</a>
+      <a href="#termine">Termine</a>
+      <a href="live.html">Live-Daten</a>
+    </div>
+  </div>
+</footer>
+
+<div class="cfg-toggle" onclick="toggleCfg()">⚙</div>
+<div class="cfg-panel" id="cfgPanel">
+  <label>Sync-Server-URL</label>
+  <!-- <input id="serverUrl" type="text" placeholder="https://monotjserver.duckdns.org" value="http://192.168.0.15:8420"> -->
+  <input id="serverUrl" type="text" placeholder="https://monotjserver.duckdns.org" value="https://monotjserver.duckdns.org">
+  <button onclick="loadData()">Verbinden</button>
+  <div class="cfg-status" id="cfgStatus">Noch nicht verbunden.</div>
+</div>
+
+<script>
+const DEFAULT_API_BASE = '';
+
+function toggleCfg(){ document.getElementById('cfgPanel').classList.toggle('open'); }
+function esc(s){
+  return String(s == null ? '' : s).replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c]));
+}
+
+// Erkennt "dd.mm.yyyy" oder "yyyy-mm-dd" + optionales "HH:mm". Gibt null
+// zurück, wenn das Format nicht eindeutig lesbar ist -- dann wird das Event
+// ohne Zeitangabe / Sortierung ans Ende gestellt statt etwas Falsches zu zeigen.
+function parseEventDateTime(dateStr, timeStr){
+  if(!dateStr) return null;
+  let d = null;
+  const ddmmyyyy = dateStr.match(/^(\d{1,2})\.(\d{1,2})\.(\d{4})$/);
+  const isoDate = dateStr.match(/^(\d{4})-(\d{1,2})-(\d{1,2})$/);
+  if(ddmmyyyy){ d = new Date(+ddmmyyyy[3], +ddmmyyyy[2]-1, +ddmmyyyy[1]); }
+  else if(isoDate){ d = new Date(+isoDate[1], +isoDate[2]-1, +isoDate[3]); }
+  else return null;
+  const t = (timeStr || '').match(/^(\d{1,2}):(\d{2})$/);
+  if(t){ d.setHours(+t[1], +t[2], 0, 0); }
+  return isNaN(d.getTime()) ? null : d;
+}
+
+function renderHeroNextEvent(planned){
+  const upcoming = (planned || [])
+    .map(p => ({ p, when: parseEventDateTime(p.date, p.time) }))
+    .filter(x => x.when && x.when.getTime() > Date.now())
+    .sort((a,b) => a.when - b.when);
+  const el = document.getElementById('heroNextEvent');
+  if(!upcoming.length){ el.textContent = 'Aktuell kein Termin im Event Manager eingetragen'; return; }
+  const { p, when } = upcoming[0];
+  const days = Math.max(0, Math.round((when.getTime() - Date.now()) / 86400000));
+  const inText = days === 0 ? 'heute' : days === 1 ? 'morgen' : `in ${days} Tagen`;
+  el.textContent = `Nächstes Event: ${p.title || 'Rennen'} — ${inText}`;
+}
+
+function renderTermine(planned){
+  const box = document.getElementById('termineList');
+  const withDate = (planned || []).map(p => ({ p, when: parseEventDateTime(p.date, p.time) }));
+  const upcoming = withDate.filter(x => x.when && x.when.getTime() > Date.now()).sort((a,b) => a.when - b.when);
+  const undated = withDate.filter(x => !x.when);
+  const all = [...upcoming, ...undated];
+  if(!all.length){
+    box.innerHTML = '<div class="termin-row"><div class="info"><div class="sub">Aktuell keine Termine im Event Manager eingetragen.</div></div></div>';
+    return;
+  }
+  box.innerHTML = all.map(({p, when}) => {
+    const dateLabel = when
+      ? when.toLocaleDateString('de-DE', {weekday:'short', day:'2-digit', month:'2-digit'}) + ' · ' + when.toLocaleTimeString('de-DE', {hour:'2-digit', minute:'2-digit'})
+      : (p.date || 'Termin offen');
+    return `
+      <div class="termin-row">
+        <span class="swatch" style="background:var(--c-racing)"></span>
+        <div class="date mono">${esc(dateLabel)}</div>
+        <div class="info"><div class="title">${esc(p.title || 'Event')}</div><div class="sub">${esc([p.game, p.track].filter(Boolean).join(' · '))}</div></div>
+        <div class="cat-label">Racing</div>
+      </div>`;
+  }).join('');
+}
+
+function renderTournamentsList(tournaments){
+  const box = document.getElementById('tournamentList');
+  const list = Object.values(tournaments || {});
+  if(!list.length){
+    box.innerHTML = '<div class="termin-row"><div class="info"><div class="sub">Aktuell keine Turniere im Event Manager eingetragen.</div></div></div>';
+    return;
+  }
+  box.innerHTML = list.map(t => `
+    <div class="termin-row">
+      <span class="swatch" style="background:var(--c-tournament)"></span>
+      <div class="info"><div class="title">${esc(t.title)}</div><div class="sub">${(t.participants||[]).length} Teilnehmer · ${esc(t.type || '')}</div></div>
+      <div class="cat-label">${esc(t.status || '')}</div>
+    </div>`).join('');
+}
+
+// Wandelt Rundenzeiten wie "1:29.982" oder "89.982" in Millisekunden um,
+// damit sich die schnellste Zeit über mehrere Fahrer/Events hinweg vergleichen
+// lässt. Unlesbare Werte liefern null, statt einen falschen Vergleich zuzulassen.
+function parseLapTime(str){
+  if(!str) return null;
+  const m = String(str).trim().match(/^(?:(\d+):)?(\d{1,2}(?:\.\d+)?)$/);
+  if(!m) return null;
+  const min = m[1] ? parseInt(m[1], 10) : 0;
+  const sec = parseFloat(m[2]);
+  if(isNaN(sec)) return null;
+  return min * 60000 + sec * 1000;
+}
+
+// Reihenfolge spiegelt die entscheidende Quali-Session je Wochenend-Typ im
+// Event Manager (QUALI_KEYS): "q3" für volle Quali-Wochenenden, sonst die
+// Alternativ-Keys anderer Formate.
+const QUALI_KEYS = ['q3', 'rd_q', 'sw_q'];
+function eventQualiResult(ev){
+  const sessions = ev.sessions || {};
+  for(const key of QUALI_KEYS){
+    if(sessions[key] && sessions[key].length) return sessions[key];
+  }
+  return [];
+}
+
+let allEvents = [];
+let selectedGame = 'all';
+
+function buildGameFilter(events){
+  const games = Array.from(new Set(events.map(e => e.game).filter(Boolean))).sort();
+  const box = document.getElementById('gameFilter');
+  if(games.length <= 1){ box.innerHTML = ''; return; }
+  const pills = ['all', ...games];
+  box.innerHTML = pills.map(g =>
+    `<button data-game="${esc(g)}" class="${g===selectedGame?'active':''}">${g==='all'?'Alle Spiele':esc(g)}</button>`
+  ).join('');
+  box.querySelectorAll('button').forEach(btn => {
+    btn.addEventListener('click', () => {
+      selectedGame = btn.dataset.game;
+      box.querySelectorAll('button').forEach(b => b.classList.toggle('active', b === btn));
+      renderRacingSection(allEvents);
+    });
+  });
+}
+
+function filteredEvents(events){
+  return selectedGame === 'all' ? events : events.filter(e => e.game === selectedGame);
+}
+
+function renderStandings(events){
+  const totals = {}; // player -> {points, wins, podiums, poles}
+  events.forEach(ev => {
+    (ev.results || []).forEach(r => {
+      if(!r.player) return;
+      const s = totals[r.player] || (totals[r.player] = {points:0, wins:0, podiums:0, poles:0});
+      s.points += Number(r.points) || 0;
+      if(r.position === 1) s.wins += 1;
+      if(r.position && r.position <= 3) s.podiums += 1;
+    });
+    eventQualiResult(ev).forEach(r => {
+      if(r.player && r.position === 1){
+        const s = totals[r.player] || (totals[r.player] = {points:0, wins:0, podiums:0, poles:0});
+        s.poles += 1;
+      }
+    });
+  });
+  const ranked = Object.entries(totals).sort((a,b) => b[1].points - a[1].points);
+  const body = document.getElementById('standingsBody');
+  if(!ranked.length){
+    body.innerHTML = '<tr><td colspan="6" style="padding:20px 16px;color:var(--fg-dim)">Noch keine Ergebnisse veröffentlicht.</td></tr>';
+    return;
+  }
+  body.innerHTML = ranked.map(([name, s], i) => {
+    const cls = i===0?'p1':i===1?'p2':i===2?'p3':'';
+    return `<tr class="${cls}"><td class="pos mono">${i+1}</td><td>${esc(name)}</td><td class="pts mono">${s.wins}</td><td class="pts mono">${s.podiums}</td><td class="pts mono">${s.poles}</td><td class="pts mono">${s.points}</td></tr>`;
+  }).join('');
+}
+
+function renderRecords(events){
+  const box = document.getElementById('recordsBox');
+  const wins = {}, poles = {};
+  let fastest = null; // {ms, display, player, track}
+  events.forEach(ev => {
+    (ev.results || []).forEach(r => {
+      if(!r.player) return;
+      if(r.position === 1) wins[r.player] = (wins[r.player]||0) + 1;
+      const ms = parseLapTime(r.best_time);
+      if(ms != null && (!fastest || ms < fastest.ms)){
+        fastest = { ms, display: r.best_time, player: r.player, track: ev.track || ev.name };
+      }
+    });
+    eventQualiResult(ev).forEach(r => {
+      if(r.player && r.position === 1) poles[r.player] = (poles[r.player]||0) + 1;
+    });
+  });
+  const topWins = Object.entries(wins).sort((a,b) => b[1]-a[1])[0];
+  const topPoles = Object.entries(poles).sort((a,b) => b[1]-a[1])[0];
+  const rows = [];
+  rows.push(`<div class="record-row"><div>Meiste Siege</div><div class="val">${topWins ? esc(topWins[0]) + ' (' + topWins[1] + ')' : '—'}</div></div>`);
+  rows.push(`<div class="record-row"><div>Meiste Poles</div><div class="val">${topPoles ? esc(topPoles[0]) + ' (' + topPoles[1] + ')' : '—'}</div></div>`);
+  rows.push(`<div class="record-row"><div>Schnellste Zeit</div><div class="val">${fastest ? esc(fastest.display) : '—'}</div></div>`);
+  if(fastest){ rows.push(`<div class="record-row"><div>${esc(fastest.player)}</div><div class="val" style="color:var(--fg-dim)">${esc(fastest.track||'')}</div></div>`); }
+  box.innerHTML = rows.join('');
+}
+
+function renderLastRacePodium(events){
+  const box = document.getElementById('podiumBox');
+  const title = document.getElementById('lastRaceTitle');
+  document.getElementById('lastRaceLabel').textContent = selectedGame === 'all' ? 'Letztes Rennen' : `Letztes Rennen · ${selectedGame}`;
+  const list = events;
+  if(!list.length){
+    title.textContent = '—';
+    box.innerHTML = '<div style="color:var(--fg-dim);font-size:13px;">Noch keine Events veröffentlicht.</div>';
+    return;
+  }
+  const last = list[list.length - 1];
+  title.textContent = last.track || last.name || 'Rennen';
+  const podium = (last.results || []).slice().sort((a,b) => (a.position||99)-(b.position||99)).slice(0,3);
+  if(!podium.length){ box.innerHTML = '<div style="color:var(--fg-dim);font-size:13px;">Keine Ergebnisse für dieses Event.</div>'; return; }
+  const medalCls = ['gold','silver','bronze'];
+  const medalTxt = ['P1','P2','P3'];
+  box.innerHTML = podium.map((r,i) => `
+    <div class="podium-row ${medalCls[i]}">
+      <div class="medal">${medalTxt[i]}</div>
+      <div style="flex:1">${esc(r.player)}</div>
+      <div class="time">${esc(r.best_time || '')}</div>
+    </div>`).join('');
+}
+
+function renderRacingSection(events){
+  const filtered = filteredEvents(events);
+  renderStandings(filtered);
+  renderRecords(filtered);
+  renderLastRacePodium(filtered);
+}
+
+// ── Among Us ──────────────────────────────────────────────────────────────
+// Spiegelt exakt _among_us_compute_all_player_stats() aus mixins/among_us.py:
+// rundenbasiert, rollenabhängiges Punktesystem, Punktestand nie unter 0.
+function computeAmongUsStats(events, settings){
+  const pts = {
+    crewmate_win: settings.crewmate_win_points ?? settings.win_points ?? 1,
+    crewmate_loss: settings.crewmate_loss_points ?? settings.loss_points ?? -1,
+    impostor_win: settings.impostor_win_points ?? settings.win_points ?? 2,
+    impostor_loss: settings.impostor_loss_points ?? settings.loss_points ?? -1,
+  };
+  const stats = {};
+  const sorted = (events || []).slice().sort((a,b) => (a.date||'').localeCompare(b.date||''));
+  sorted.forEach(ev => {
+    const participants = ev.participants || [];
+    (ev.rounds || []).forEach(r => {
+      const impostors = new Set(r.impostors || []);
+      const winnerSide = r.winner_side;
+      participants.forEach(p => {
+        const s = stats[p] || (stats[p] = {rounds:0, wins:0, losses:0, points:0, impostor_rounds:0, crewmate_wins:0, impostor_wins:0});
+        s.rounds += 1;
+        const isImp = impostors.has(p);
+        if(isImp) s.impostor_rounds += 1;
+        const side = isImp ? 'Impostors' : 'Crewmates';
+        let delta;
+        if(side === winnerSide){
+          s.wins += 1;
+          delta = isImp ? pts.impostor_win : pts.crewmate_win;
+          if(isImp) s.impostor_wins += 1; else s.crewmate_wins += 1;
+        }else{
+          s.losses += 1;
+          delta = isImp ? pts.impostor_loss : pts.crewmate_loss;
+        }
+        s.points = Math.max(0, s.points + delta);
+      });
+    });
+  });
+  return stats;
+}
+
+function renderAmongUsStandings(events, settings){
+  const stats = computeAmongUsStats(events, settings || {});
+  const ranked = Object.entries(stats).sort((a,b) => b[1].points - a[1].points);
+  const body = document.getElementById('amongUsStandingsBody');
+  if(!ranked.length){
+    body.innerHTML = '<tr><td colspan="5" style="padding:20px 16px;color:var(--fg-dim)">Noch keine Runden gespielt.</td></tr>';
+    return;
+  }
+  body.innerHTML = ranked.map(([name, s], i) => {
+    const cls = i===0?'p1':i===1?'p2':i===2?'p3':'';
+    return `<tr class="${cls}"><td class="pos mono">${i+1}</td><td>${esc(name)}</td><td class="pts mono">${s.rounds}</td><td class="pts mono">${s.wins}</td><td class="pts mono">${s.points}</td></tr>`;
+  }).join('');
+}
+
+// Katalog spiegelt AMONG_US_ACHIEVEMENTS aus mixins/among_us.py 1:1 (Definition,
+// nicht personenbezogen -- wer was freigeschaltet hat, kommt aus den echten
+// among_us_achievements_unlocked-Daten unten).
+const AMONG_US_ACHIEVEMENTS = [
+  ['first_win','🎉','Erster Sieg','Die erste gewonnene Runde'],
+  ['wins_5','🏅','5 Siege','5 gewonnene Runden insgesamt'],
+  ['wins_10','🏆','10 Siege','10 gewonnene Runden insgesamt'],
+  ['wins_25','👑','25 Siege','25 gewonnene Runden insgesamt'],
+  ['rounds_10','🎮','Vielspieler','10 gespielte Runden'],
+  ['rounds_50','🕹️','Among-Us-Veteran','50 gespielte Runden'],
+  ['impostor_wins_5','😈','Meister-Täuscher','5 Siege als Impostor'],
+  ['crewmate_wins_10','🛠️','Teamplayer','10 Siege als Crewmate'],
+  ['points_20','⭐','Punktesammler','20 Punkte erreicht'],
+  ['points_50','🌟','Punkte-Legende','50 Punkte erreicht'],
+  ['streak_5','🔥','Siegesserie','5 Runden in Folge als Crewmate gewonnen'],
+];
+
+function renderAchievements(unlocked){
+  const box = document.getElementById('achievementsBox');
+  unlocked = unlocked || {};
+  box.innerHTML = AMONG_US_ACHIEVEMENTS.map(([aid, emoji, name, desc]) => {
+    const holders = Object.keys(unlocked).filter(p => (unlocked[p]||[]).includes(aid));
+    const tags = holders.length
+      ? holders.map(p => `<span class="badge" style="background:var(--surface-2);border:1px solid var(--line);padding:2px 8px;border-radius:10px;font-size:11px;">${esc(p)}</span>`).join(' ')
+      : '<span style="color:var(--fg-faint)">noch niemand</span>';
+    return `
+      <div class="record-row" style="flex-direction:column; align-items:flex-start; gap:4px;">
+        <div><strong style="color:var(--fg)">${emoji} ${esc(name)}</strong> <span style="color:var(--fg-dim)">— ${esc(desc)}</span></div>
+        <div style="display:flex;gap:4px;flex-wrap:wrap;">${tags}</div>
+      </div>`;
+  }).join('');
+}
+
+function renderSpartenMeta(events, tournaments, amongUsEvents, amongUsSettings){
+  const totals = {};
+  (events || []).forEach(ev => (ev.results||[]).forEach(r => { if(r.player) totals[r.player] = (totals[r.player]||0) + (Number(r.points)||0); }));
+  const ranked = Object.entries(totals).sort((a,b) => b[1]-a[1]);
+  const racingEl = document.getElementById('sparteRacingMeta');
+  racingEl.textContent = ranked.length
+    ? `${ranked.length} Fahrer in der Wertung · Führend: ${ranked[0][0]} (${ranked[0][1]} Pkt.)`
+    : 'Noch keine Ergebnisse veröffentlicht';
+
+  const tList = Object.values(tournaments || {});
+  const active = tList.filter(t => t.status !== 'finished').length;
+  const tEl = document.getElementById('sparteTournamentMeta');
+  tEl.textContent = tList.length
+    ? `${tList.length} Turnier(e) insgesamt · ${active} laufend`
+    : 'Noch keine Turniere eingetragen';
+
+  const auStats = computeAmongUsStats(amongUsEvents || [], amongUsSettings || {});
+  const auCount = Object.keys(auStats).length;
+  const totalRounds = (amongUsEvents || []).reduce((sum, ev) => sum + (ev.rounds||[]).length, 0);
+  const auEl = document.getElementById('sparteAmongUsMeta');
+  auEl.textContent = totalRounds
+    ? `${totalRounds} Runde(n) gespielt · ${auCount} Spieler aktiv`
+    : 'Noch keine Runden gespielt';
+}
+
+function renderTeams(teams){
+  const box = document.getElementById('teamsBox');
+  const list = teams || [];
+  if(!list.length){ box.innerHTML = '<span style="color:var(--fg-dim);font-size:13px;">Keine Teams veröffentlicht.</span>'; return; }
+  box.innerHTML = list.map(t => `<span class="badge" style="background:var(--surface-2);border:1px solid var(--line);padding:3px 10px;border-radius:12px;font-size:12px;">${esc(t)}</span>`).join('');
+}
+
+async function loadData(){
+  const base = (document.getElementById('serverUrl').value || DEFAULT_API_BASE).trim().replace(/\/$/, '');
+  const statusEl = document.getElementById('cfgStatus');
+  statusEl.textContent = 'Lade …';
+  try{
+    const resp = await fetch(base + '/api/v1/public/data?datasets=events,planned_events,tournaments,ac_teams,among_us_events,among_us_settings,among_us_achievements_unlocked');
+    if(!resp.ok) throw new Error('HTTP ' + resp.status);
+    const body = await resp.json();
+    const data = body.data || {};
+    allEvents = data.events || [];
+
+    renderHeroNextEvent(data.planned_events || []);
+    renderTermine(data.planned_events || []);
+    renderTournamentsList(data.tournaments || {});
+    renderSpartenMeta(data.events || [], data.tournaments || {}, data.among_us_events || [], data.among_us_settings || {});
+    renderTeams(data.ac_teams || []);
+    buildGameFilter(allEvents);
+    renderRacingSection(allEvents);
+    renderAmongUsStandings(data.among_us_events || [], data.among_us_settings || {});
+    renderAchievements(data.among_us_achievements_unlocked || {});
+
+    statusEl.textContent = 'Verbunden — Stand: ' + (body.generated_at ? new Date(body.generated_at).toLocaleString('de-DE') : '—');
+  }catch(e){
+    statusEl.textContent = 'Fehler: ' + e.message;
+  }
+  setTimeout(loadData, 60000);
+}
+
+document.getElementById('discordLink').addEventListener('click', e => {
+  e.preventDefault();
+  alert('Hier euren echten Discord-Invite-Link eintragen.');
+});
+
+loadData();
+</script>
+</body>
+</html>
